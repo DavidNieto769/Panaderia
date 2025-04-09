@@ -1,15 +1,26 @@
 package panaderia.controlador;
 
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import panaderia.modelo.Galleta;
+import panaderia.modelo.Pan;
 import panaderia.modelo.Producto;
 import panaderia.modelo.reporte.*;
+import panaderia.vista.FormularioProducto;
+
+import javax.swing.*;
 
 public class ControladorInventario {
  
@@ -108,6 +119,124 @@ public class ControladorInventario {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
+    public boolean registrarVenta(String nombreProducto, int cantidadVendida, Component parentComponent) {
+        Producto producto = inventario.getProductos().stream()
+                .filter(p -> p.getNombre().equals(nombreProducto))
+                .findFirst()
+                .orElse(null);
+
+        if (producto == null) {
+            JOptionPane.showMessageDialog(parentComponent, "Producto no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (producto.getCantidad() < cantidadVendida) {
+            JOptionPane.showMessageDialog(parentComponent, "No hay suficiente stock para realizar esta venta.", "Stock insuficiente", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        // Actualizar inventario
+        producto.setCantidad(producto.getCantidad() - cantidadVendida);
+        guardarSerializable();
+
+        // Clonar el producto vendido según su tipo
+        Producto vendido;
+        if (producto instanceof Pan) {
+            vendido = new Pan(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra());
+        } else if (producto instanceof Galleta) {
+            vendido = new Galleta(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra());
+        } else {
+            JOptionPane.showMessageDialog(parentComponent, "Tipo de producto desconocido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Registrar la venta
+        Venta venta = new Venta();
+        venta.agregarProducto(vendido);
+        VentasSerializable.guardarVenta(venta);
+
+        return true;
+    }
+
+
+    public void mostrarDialogoVenta(Component parentComponent, Runnable callbackActualizarTabla) {
+        // Se obtiene la lista de productos disponibles (con cantidad mayor a 0)
+        List<Producto> disponibles = inventario.getProductos().stream()
+                .filter(p -> p.getCantidad() > 0)
+                .toList();
+
+        if (disponibles.isEmpty()) {
+            JOptionPane.showMessageDialog(parentComponent, "No hay productos disponibles para vender.");
+            return;
+        }
+
+        // ComboBox con los nombres de productos
+        JComboBox<String> combo = new JComboBox<>();
+        for (Producto p : disponibles) {
+            combo.addItem(p.getNombre());
+        }
+
+        JTextField campoCantidad = new JTextField();
+
+        JPanel panelVenta = new JPanel(new GridLayout(2, 2));
+        panelVenta.add(new JLabel("Producto:"));
+        panelVenta.add(combo);
+        panelVenta.add(new JLabel("Cantidad a vender:"));
+        panelVenta.add(campoCantidad);
+
+        int opcion = JOptionPane.showConfirmDialog(
+                parentComponent,
+                panelVenta,
+                "Venta de producto",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (opcion == JOptionPane.OK_OPTION) {
+            String productoSeleccionado = (String) combo.getSelectedItem();
+            String cantidadTexto = campoCantidad.getText().trim();
+
+            try {
+                int cantidad = Integer.parseInt(cantidadTexto);
+                if (cantidad <= 0) {
+                    throw new NumberFormatException("La cantidad debe ser mayor que cero.");
+                }
+
+                boolean exito = registrarVenta(productoSeleccionado, cantidad, parentComponent);
+                if (exito) {
+                    callbackActualizarTabla.run();
+                    JOptionPane.showMessageDialog(parentComponent, "Venta realizada con éxito.");
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(parentComponent, "Cantidad inválida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+
+    public List<String[]> obtenerVentas() {
+        List<String[]> ventas = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("reporteVentas.ser"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 5) {
+                    ventas.add(datos);
+                }
+            }
+        } catch (IOException e) {
+            // Puedes registrar el error si lo deseas o simplemente devolver la lista vacía
+            e.printStackTrace();
+        }
+
+        return ventas;
+    }
+
+
+
 
 
 

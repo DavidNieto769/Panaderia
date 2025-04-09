@@ -2,15 +2,22 @@ package panaderia.modelo.reporte;
 
 import panaderia.modelo.Producto;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Venta {
+public class Venta implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private List<Producto> productos;
+    private String fecha; // ⬅️ Nuevo atributo
 
     public Venta() {
         this.productos = new ArrayList<>();
+        this.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); // ⬅️ Asignar fecha actual al crear
     }
 
     public void agregarProducto(Producto producto) {
@@ -19,6 +26,10 @@ public class Venta {
 
     public List<Producto> getProductos() {
         return productos;
+    }
+
+    public String getFecha() {
+        return fecha;
     }
 
     public Producto buscarProductoPorNombre(String nombre) {
@@ -47,8 +58,6 @@ public class Venta {
             }
         }
     }
-
-
 
     public List<Producto> filtrarPorNombre(String nombreParcial) {
         return productos.stream()

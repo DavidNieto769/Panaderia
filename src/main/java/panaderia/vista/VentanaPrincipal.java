@@ -1,17 +1,13 @@
 package panaderia.vista;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import panaderia.controlador.*;
-import panaderia.fabrica.*;
 import panaderia.modelo.*;
+import panaderia.modelo.reporte.Venta;
+import panaderia.modelo.reporte.VentasSerializable;
+
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
@@ -69,8 +65,13 @@ public class VentanaPrincipal extends JFrame {
                 controlador.crearProducto(this, () -> actualizarTabla(controlador.obtenerProductos()))
         );
 
-        btnVender.addActionListener(e -> mostrarDialogoVenta());
+        btnVender.addActionListener(e -> {
+            controlador.mostrarDialogoVenta(this, () -> actualizarTabla(controlador.obtenerProductos()));
+        });
+
         btnVerVentas.addActionListener(e -> mostrarVentas());
+
+
         btnFiltrar.addActionListener(e -> filtrar());
         btnLimpiar.addActionListener(e -> {
             // Limpia los campos de filtro y actualiza la tabla con todos los productos
@@ -116,158 +117,41 @@ public class VentanaPrincipal extends JFrame {
         add(panelPrincipal); // Se añade el panel principal al contenedor
     }
 
-
-    private void mostrarDialogoVenta() {
-        // Se obtiene la lista de productos disponibles (con cantidad mayor a 0)
-        List<Producto> disponibles = controlador.obtenerProductos().stream()
-            .filter(p -> p.getCantidad() > 0)
-            .toList();
-
-        // Si no hay productos disponibles, se muestra un mensaje al usuario y se sale del método
-        if (disponibles.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No hay productos disponibles para vender.");
-            return;
-        }
-
-        // Se crea un combo box (lista desplegable) para seleccionar el producto
-        JComboBox<String> combo = new JComboBox<>();
-        for (Producto p : disponibles) {
-            combo.addItem(p.getNombre()); // Se agregan los nombres de los productos disponibles
-        }
-
-        // Campo de texto para que el usuario ingrese la cantidad a vender
-        JTextField campoCantidad = new JTextField();
-
-        // Se crea un panel para organizar los componentes del diálogo
-        JPanel panelVenta = new JPanel(new GridLayout(2, 2));
-        panelVenta.add(new JLabel("Producto:"));
-        panelVenta.add(combo);
-        panelVenta.add(new JLabel("Cantidad a vender:"));
-        panelVenta.add(campoCantidad);
-
-        // Se muestra un cuadro de diálogo con el panel de venta
-        int opcion = JOptionPane.showConfirmDialog(
-            this,
-            panelVenta,
-            "Venta de producto",
-            JOptionPane.OK_CANCEL_OPTION
-        );
-
-        // Si el usuario presiona OK, se procede a procesar la venta
-        if (opcion == JOptionPane.OK_OPTION) {
-            String productoSeleccionado = (String) combo.getSelectedItem(); // Nombre del producto seleccionado
-            String cantidadTexto = campoCantidad.getText().trim(); // Cantidad ingresada por el usuario
-
-            try {
-                int cantidad = Integer.parseInt(cantidadTexto); // Se convierte a entero
-                if (cantidad <= 0) {
-                    throw new NumberFormatException("La cantidad debe ser mayor que cero.");
-                }
-
-                // Se registra la venta del producto con la cantidad especificada
-                registrarVentaProducto(productoSeleccionado, cantidad);
-
-            } catch (NumberFormatException e) {
-                // Si la cantidad ingresada no es válida, se muestra un mensaje de error
-                JOptionPane.showMessageDialog(this, "Cantidad inválida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-
-
-    private void registrarVentaProducto(String nombreProducto, int cantidadVendida) {
-        // Se obtiene la lista actual de productos desde el controlador
-        List<Producto> productos = controlador.obtenerProductos();
-
-        // Se busca el producto cuyo nombre coincida con el seleccionado
-        Producto producto = productos.stream()
-            .filter(p -> p.getNombre().equals(nombreProducto))
-            .findFirst()
-            .orElse(null);
-
-        // Si el producto no se encuentra, se muestra un mensaje de error y se termina el proceso
-        if (producto == null) {
-            JOptionPane.showMessageDialog(this, "Producto no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Si la cantidad en inventario es menor a la solicitada para la venta, se avisa al usuario
-        if (producto.getCantidad() < cantidadVendida) {
-            JOptionPane.showMessageDialog(this, "No hay suficiente stock para realizar esta venta.", "Stock insuficiente", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        // Se descuenta la cantidad vendida del inventario del producto
-        producto.setCantidad(producto.getCantidad() - cantidadVendida);
-
-        // Se guarda el nuevo estado del inventario en el archivo serializado
-        controlador.guardarSerializable();
-
-        // Se obtiene la fecha y hora actual para registrar la venta
-        String fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
-        // Se calcula el total de la venta (cantidad vendida * precio unitario)
-        double total = cantidadVendida * producto.getPrecioVenta();
-
-        // Se forma la línea de texto que representa la venta
-        String lineaVenta = String.format("%s,%s,%d,%.2f,%.2f\n", fecha, nombreProducto, cantidadVendida, producto.getPrecioVenta(), total);
-
-        // Se escribe la línea de venta al final del archivo "reporteVentas.ser"
-
-
-        try (FileWriter fw = new FileWriter("reporteVentas.ser", true)) {
-            fw.write(lineaVenta);
-        } catch (IOException e) {
-            // Si ocurre un error al guardar, se informa al usuario
-            JOptionPane.showMessageDialog(this, "Error al guardar la venta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-        // Se actualiza la tabla en la interfaz gráfica con los productos actualizados
-        actualizarTabla(productos);
-
-        // Se notifica al usuario que la venta fue realizada con éxito
-        JOptionPane.showMessageDialog(this, "Venta realizada con éxito.");
-    }
-
-
-
     private void mostrarVentas() {
-        // Se crea un modelo de tabla con los nombres de las columnas para mostrar las ventas
-        DefaultTableModel modeloVentas = new DefaultTableModel(new Object[] {
-            "Fecha", "Producto", "Cantidad", "Precio Unitario", "Total"
+        DefaultTableModel modeloVentas = new DefaultTableModel(new Object[]{
+                "Fecha", "Producto", "Cantidad", "Precio Unitario", "Total"
         }, 0);
 
-        // Se intenta abrir y leer el archivo  que contiene las ventas
-        try (BufferedReader br = new BufferedReader(new FileReader("reporteVentas.ser"))) {
-            String linea;
-            // Se lee línea por línea del archivo
-            while ((linea = br.readLine()) != null) {
-                // Se separa cada línea en columnas usando la coma como delimitador
-                String[] datos = linea.split(",");
-                // Si la línea tiene los 5 campos esperados, se añade al modelo de la tabla
-                if (datos.length == 5) {
-                    modeloVentas.addRow(datos);
-                }
+        List<Venta> ventas = VentasSerializable.cargarVentas();
+        for (Venta v : ventas) {
+            for (Producto p : v.getProductos()) {
+                Object[] fila = new Object[]{
+                        v.getFecha(),
+                        p.getNombre(),
+                        p.getCantidad(),
+                        p.getPrecioVenta(),
+                        p.getCantidad() * p.getPrecioVenta()
+                };
+                modeloVentas.addRow(fila);
             }
+        }
 
-        } catch (IOException e) {
-            // Si ocurre un error al leer el archivo, se muestra un mensaje de error
-            JOptionPane.showMessageDialog(this, "No se pudo leer el archivo de ventas.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (modeloVentas.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "No hay ventas registradas.", "Información", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        // Se crea una tabla visual con el modelo de datos cargado
         JTable tablaVentas = new JTable(modeloVentas);
         JScrollPane scrollPane = new JScrollPane(tablaVentas);
 
-        // Se muestra la tabla dentro de un cuadro de diálogo informativo
         JOptionPane.showMessageDialog(this, scrollPane, "Ventas realizadas", JOptionPane.INFORMATION_MESSAGE);
     }
 
 
 
-    
+
+
+
     private void filtrar() {
         // Se obtienen los textos ingresados por el usuario para filtrar por nombre, precio y cantidad
         String nombreFiltro = filtroNombre.getText().trim();
