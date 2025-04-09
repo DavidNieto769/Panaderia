@@ -14,8 +14,7 @@ import java.awt.*;
 import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
-    private ControladorInventario controlador;
-    private ControladorVista controladorVista;
+    private final ControladorVista controladorVista;
 
     private JTable tabla;
     private DefaultTableModel modeloTabla;
@@ -23,7 +22,7 @@ public class VentanaPrincipal extends JFrame {
     private JTextField filtroNombre, filtroPrecio, filtroCantidad;
 
     public VentanaPrincipal() {
-        controlador = new ControladorInventario();
+        ControladorInventario controlador = new ControladorInventario();
         controladorVista = new ControladorVista(controlador);
 
         setTitle("Gestión de Panadería");
@@ -81,16 +80,25 @@ public class VentanaPrincipal extends JFrame {
                 controladorVista.mostrarVentas(this)
         );
 
-        btnFiltrar.addActionListener(e -> aplicarFiltros());
+        btnFiltrar.addActionListener(e ->
+                controladorVista.aplicarFiltros(
+                        filtroNombre.getText(),
+                        filtroPrecio.getText(),
+                        filtroCantidad.getText(),
+                        this::actualizarTabla,
+                        mensajeError -> JOptionPane.showMessageDialog(this, mensajeError, "Error", JOptionPane.ERROR_MESSAGE)
+                )
+        );
 
         btnLimpiar.addActionListener(e -> {
-            filtroNombre.setText("");
-            filtroPrecio.setText("");
-            filtroCantidad.setText("");
+            limpiarFiltros();
             actualizarTabla(controladorVista.obtenerProductos());
         });
 
-        btnGuardar.addActionListener(e -> controladorVista.guardarReportes(this));
+
+        btnGuardar.addActionListener(e ->
+                controladorVista.guardarReportes(this)
+        );
 
         panelBotones.add(btnAgregar);
         panelBotones.add(btnFiltrar);
@@ -127,7 +135,7 @@ public class VentanaPrincipal extends JFrame {
         modeloTabla = new DefaultTableModel(new Object[]{"Nombre", "Precio", "Costo", "Cantidad", "Extra"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Hacer la tabla no editable
+                return false;
             }
         };
 
@@ -154,40 +162,10 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    private void aplicarFiltros() {
-        String nombre = filtroNombre.getText().trim();
-        String precioTexto = filtroPrecio.getText().trim();
-        String cantidadTexto = filtroCantidad.getText().trim();
-
-        if (!precioTexto.isEmpty() && !esNumero(precioTexto)) {
-            JOptionPane.showMessageDialog(this, "El precio debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (!cantidadTexto.isEmpty() && !esEntero(cantidadTexto)) {
-            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        List<Producto> filtrados = controladorVista.aplicarFiltros(nombre, precioTexto, cantidadTexto);
-        actualizarTabla(filtrados);
+    private void limpiarFiltros() {
+        filtroNombre.setText("");
+        filtroPrecio.setText("");
+        filtroCantidad.setText("");
     }
 
-    private boolean esNumero(String texto) {
-        try {
-            Double.parseDouble(texto);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean esEntero(String texto) {
-        try {
-            Integer.parseInt(texto);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
 }

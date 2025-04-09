@@ -27,7 +27,7 @@ public class ControladorVista {
     public void guardarReportes(JFrame frame) {
         controlador.guardarReporteConFecha();
         controlador.guardarReporteVentasConFecha();
-        JOptionPane.showMessageDialog(frame, "Reporte generado exitosamente.");
+        mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 
     public void mostrarVentas(JFrame frame) {
@@ -50,7 +50,7 @@ public class ControladorVista {
         }
 
         if (modeloVentas.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(frame, "No hay ventas registradas.", "Información", JOptionPane.INFORMATION_MESSAGE);
+            mostrarMensaje(frame, "No hay ventas registradas.", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
@@ -59,11 +59,54 @@ public class ControladorVista {
         JOptionPane.showMessageDialog(frame, scrollPane, "Ventas realizadas", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public List<Producto> aplicarFiltros(String nombre, String precio, String cantidad) {
-        return controlador.filtrar(nombre.trim(), precio.trim(), cantidad.trim());
+    public void aplicarFiltros(String nombre, String precioTexto, String cantidadTexto, Consumer<List<Producto>> callback, Consumer<String> onError) {
+        nombre = nombre.trim();
+        precioTexto = precioTexto.trim();
+        cantidadTexto = cantidadTexto.trim();
+
+        if (!precioTexto.isEmpty() && !esNumero(precioTexto)) {
+            onError.accept("El precio debe ser un número válido.");
+            return;
+        }
+
+        if (!cantidadTexto.isEmpty() && !esEntero(cantidadTexto)) {
+            onError.accept("La cantidad debe ser un número entero.");
+            return;
+        }
+
+        List<Producto> filtrados = controlador.filtrar(nombre, precioTexto, cantidadTexto);
+        callback.accept(filtrados);
     }
 
     public List<Producto> obtenerProductos() {
         return controlador.obtenerProductos();
     }
+
+    private boolean esNumero(String texto) {
+        try {
+            Double.parseDouble(texto);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean esEntero(String texto) {
+        try {
+            Integer.parseInt(texto);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private void mostrarMensaje(JFrame frame, String mensaje) {
+        mostrarMensaje(frame, mensaje, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void mostrarMensaje(JFrame frame, String mensaje, int tipo) {
+        JOptionPane.showMessageDialog(frame, mensaje, "Información", tipo);
+    }
+
+
 }
