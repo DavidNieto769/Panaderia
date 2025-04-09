@@ -4,14 +4,14 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
+import java.awt.*;
+import java.util.List;
 
 import panaderia.controlador.ControladorInventario;
 import panaderia.controlador.ControladorVista;
 import panaderia.modelo.Producto;
 import panaderia.utilidades.FiltroSoloLetras;
 
-import java.awt.*;
-import java.util.List;
 
 public class VentanaPrincipal extends JFrame {
     private final ControladorVista controladorVista;
