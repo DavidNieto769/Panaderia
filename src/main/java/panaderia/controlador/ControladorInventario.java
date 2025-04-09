@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import panaderia.modelo.Galleta;
 import panaderia.modelo.Pan;
@@ -48,18 +49,23 @@ public class ControladorInventario {
 
     // Método para aplicar filtros sobre los productos del inventario por nombre, precio máximo o cantidad mínima
     public List<Producto> filtrar(String nombre, String precioMax, String cantidadMin) {
+        // Iniciar con todos los productos del inventario
         List<Producto> filtrados = inventario.getProductos();
 
         // Se filtra por nombre si no está vacío
         if (!nombre.isEmpty()) {
-            filtrados = inventario.filtrarPorNombre(nombre);
+            filtrados = filtrados.stream()
+                    .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                    .collect(Collectors.toList());
         }
 
         // Se filtra por precio máximo si se proporciona un valor válido
         if (!precioMax.isEmpty()) {
             try {
                 double max = Double.parseDouble(precioMax);
-                filtrados = inventario.filtrarPorPrecioMaximo(max);
+                filtrados = filtrados.stream()
+                        .filter(p -> p.getPrecioVenta() <= max)
+                        .collect(Collectors.toList());
             } catch (NumberFormatException e) {
                 System.out.println("Precio inválido.");
             }
@@ -69,7 +75,9 @@ public class ControladorInventario {
         if (!cantidadMin.isEmpty()) {
             try {
                 int min = Integer.parseInt(cantidadMin);
-                filtrados = inventario.filtrarPorCantidadMinima(min);
+                filtrados = filtrados.stream()
+                        .filter(p -> p.getCantidad() >= min)
+                        .collect(Collectors.toList());
             } catch (NumberFormatException e) {
                 System.out.println("Cantidad inválida.");
             }
@@ -77,6 +85,7 @@ public class ControladorInventario {
 
         return filtrados;
     }
+
 
     // Método que guarda el estado actual del inventario en un archivo CSV especificado por el usuario
     public void guardarSerializable() {
