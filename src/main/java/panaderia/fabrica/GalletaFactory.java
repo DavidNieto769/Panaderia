@@ -1,10 +1,11 @@
 package panaderia.fabrica;
-import panaderia.modelo.*;
+
+import panaderia.modelo.Galleta;
+import panaderia.modelo.Producto;
 
 public class GalletaFactory implements Panaderia {
-
-	public Producto hornear(String nombre, double precioVenta, double costoProduccion, int cantidad,
-			boolean tieneChispas) {
-		return new Galleta(nombre, precioVenta, costoProduccion, cantidad, tieneChispas);
-	}   
+    @Override
+    public Producto hornear(String nombre, double precioVenta, double costoProduccion, int cantidad, boolean tieneChispas) {
+        return new Galleta(nombre, precioVenta, costoProduccion, cantidad, tieneChispas);
+    }
 }
