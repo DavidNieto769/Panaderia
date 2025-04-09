@@ -1,6 +1,17 @@
 package panaderia;
 
-import javax.swing.*;
+import panaderia.vista.VentanaPrincipal;
+
+public class Main {
+    public static void main(String[] args) {
+        // Asegúrate de ejecutar en el hilo de eventos de Swing
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new VentanaPrincipal().setVisible(true);
+        });
+    }
+}
+
+/* import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
@@ -25,3 +36,7 @@ public class Main {
         });
     }
 }
+*/
+
+
+

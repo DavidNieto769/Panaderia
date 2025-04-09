@@ -8,10 +8,8 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
 import panaderia.modelo.Producto;
 import panaderia.modelo.reporte.*;
-
 
 public class ControladorInventario {
  
@@ -96,4 +94,22 @@ public class ControladorInventario {
             e.printStackTrace(); 
         }
     }
+
+    public void crearProducto(Component parentComponent, Runnable actualizarVista) {
+        try {
+            Producto producto = FormularioProducto.mostrarDialogo(parentComponent);
+            if (producto != null) {
+                agregarProducto(producto);
+                guardarSerializable();
+                if (actualizarVista != null) actualizarVista.run();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(parentComponent, "Error al crear producto: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+
+
 }

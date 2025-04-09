@@ -65,7 +65,10 @@ public class VentanaPrincipal extends JFrame {
         JButton btnVerVentas = new JButton("Ver ventas");
 
         // Se asignan las acciones a los botones con expresiones lambda
-        btnAgregar.addActionListener(e -> mostrarFormulario());
+        btnAgregar.addActionListener(e ->
+                controlador.crearProducto(this, () -> actualizarTabla(controlador.obtenerProductos()))
+        );
+
         btnVender.addActionListener(e -> mostrarDialogoVenta());
         btnVerVentas.addActionListener(e -> mostrarVentas());
         btnFiltrar.addActionListener(e -> filtrar());
@@ -112,70 +115,6 @@ public class VentanaPrincipal extends JFrame {
         panelPrincipal.add(scrollPane, BorderLayout.CENTER);
         add(panelPrincipal); // Se añade el panel principal al contenedor
     }
-
-    
-    private void mostrarFormulario() {
-        // Se definen las opciones de tipo de producto
-        String[] opciones = { "Pan", "Galleta" };
-
-        // Se muestra un cuadro de diálogo para que el usuario seleccione el tipo de producto
-        String tipo = (String) JOptionPane.showInputDialog(this, "Tipo de producto", "Selecciona",
-                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
-
-        // Si el usuario selecciona una opción válida (no cancela)
-        if (tipo != null) {
-            // Se crean campos de entrada para los atributos del producto
-            JTextField nombre = new JTextField();
-            JTextField precio = new JTextField();
-            JTextField costo = new JTextField();
-            JTextField cantidad = new JTextField();
-
-            // Se define una casilla de verificación dependiendo del tipo de producto
-            JCheckBox extra = new JCheckBox(tipo.equals("Pan") ? "¿Tiene queso?" : "¿Tiene chispas de chocolate?");
-
-            // Se organizan los campos en un arreglo para mostrarlos en el cuadro de diálogo
-            Object[] campos = {
-                    "Nombre:", nombre,
-                    "Precio:", precio,
-                    "Costo:", costo,
-                    "Cantidad:", cantidad,
-                    extra
-            };
-
-            // Se muestra el cuadro de diálogo con los campos y se obtiene la opción del usuario
-            int opcion = JOptionPane.showConfirmDialog(this, campos, "Nuevo " + tipo, JOptionPane.OK_CANCEL_OPTION);
-
-            // Si el usuario presiona OK, se intenta crear el producto
-            if (opcion == JOptionPane.OK_OPTION) {
-                try {
-                    // Se obtienen y convierten los valores ingresados por el usuario
-                    String nom = nombre.getText();
-                    double p = Double.parseDouble(precio.getText());
-                    double c = Double.parseDouble(costo.getText());
-                    int cant = Integer.parseInt(cantidad.getText());
-                    boolean conExtra = extra.isSelected();
-
-                    // Se instancia la fábrica correspondiente según el tipo de producto
-                    Panaderia factory = tipo.equals("Pan") ? new PanFactory() : new GalletaFactory();
-
-                    // Se crea el producto utilizando la fábrica y se agrega al inventario
-                    Producto prod = factory.hornear(nom, p, c, cant, conExtra);
-                    controlador.agregarProducto(prod);
-
-                    // Se guarda el inventario actualizado en el archivo serializado
-                    controlador.guardarSerializable();
-
-                    // Se actualiza la tabla visual en la interfaz con los nuevos datos
-                    actualizarTabla(controlador.obtenerProductos());
-                } catch (Exception ex) {
-                    // Si ocurre un error en la conversión de datos o creación del producto, se muestra un mensaje de error
-                    JOptionPane.showMessageDialog(this, "Error al crear producto: " + ex.getMessage(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-    }
-
 
 
     private void mostrarDialogoVenta() {
