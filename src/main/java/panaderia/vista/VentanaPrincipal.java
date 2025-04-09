@@ -51,15 +51,28 @@ public class VentanaPrincipal extends JFrame {
         return panelSuperior;
     }
 
+
+
+
     private JPanel crearPanelBotones() {
         JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(2, 3, 10, 10)); // 2 filas, 3 columnas, con espacio
+        panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelBotones.setBackground(new Color(245, 245, 245)); // fondo claro
 
-        JButton btnAgregar = new JButton("Agregar Producto");
-        JButton btnFiltrar = new JButton("Filtrar");
-        JButton btnLimpiar = new JButton("Limpiar Filtros");
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnVender = new JButton("Vender Producto");
-        JButton btnVerVentas = new JButton("Ver Ventas");
+
+        // Colores personalizados
+        Color fondoBoton = new Color(60, 63, 65);       // gris oscuro elegante
+        Color textoBoton = new Color(230, 230, 230);    // texto claro
+        Font fuente = new Font("Segoe UI", Font.PLAIN, 14);
+
+
+        JButton btnAgregar = ControladorVista.crearBotonRedondeado(" Agregar", "Agregar un nuevo producto al inventario");
+        JButton btnFiltrar = ControladorVista.crearBotonRedondeado(" Filtrar", "Aplicar filtros según nombre, precio o cantidad");
+        JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar", "Limpiar todos los filtros");
+        JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Guardar", "Guardar reporte en archivo CSV");
+        JButton btnVender = ControladorVista.crearBotonRedondeado(" Vender", "Registrar la venta de un producto");
+        JButton btnVerVentas = ControladorVista.crearBotonRedondeado(" Ver Ventas", "Mostrar historial de ventas");
 
         btnAgregar.setToolTipText("Agregar un nuevo producto al inventario");
         btnFiltrar.setToolTipText("Aplicar filtros según nombre, precio o cantidad");

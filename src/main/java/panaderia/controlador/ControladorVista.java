@@ -6,6 +6,7 @@ import panaderia.modelo.reporte.VentasSerializable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -106,6 +107,37 @@ public class ControladorVista {
 
     private void mostrarMensaje(JFrame frame, String mensaje, int tipo) {
         JOptionPane.showMessageDialog(frame, mensaje, "Información", tipo);
+    }
+
+    public static JButton crearBotonRedondeado(String texto, String tooltip) {
+        JButton boton = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                if (getModel().isArmed() && getModel().isPressed()) {
+                    g2.setColor(new Color(100, 200, 150)); // verde suave
+                } else {
+                    g2.setColor(new Color(60, 63, 65)); // fondo normal
+                }
+
+                g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 14, 14);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+
+        boton.setToolTipText(tooltip);
+        boton.setFocusPainted(false);
+        boton.setContentAreaFilled(false);
+        boton.setBorderPainted(false);
+        boton.setOpaque(false);
+        boton.setForeground(new Color(240, 240, 240));
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 13)); // más chico
+        boton.setMargin(new Insets(6, 10, 6, 10)); // menos espacio
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return boton;
     }
 
 
