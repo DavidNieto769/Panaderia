@@ -2,7 +2,6 @@ package panaderia.controlador;
 
 import panaderia.modelo.Producto;
 import panaderia.modelo.reporte.Venta;
-import panaderia.modelo.reporte.VentasSerializable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

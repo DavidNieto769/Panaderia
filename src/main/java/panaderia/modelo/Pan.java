@@ -17,6 +17,12 @@ public class Pan extends Producto implements Serializable {
     return nombre + " (Pan)" + (extra ? " con queso" : "");
   }
 
+  @Override
+  public String toString() {
+    return getDescripcion();
+  }
+
+
   public boolean isTieneQueso() {
     return tieneQueso;
   }

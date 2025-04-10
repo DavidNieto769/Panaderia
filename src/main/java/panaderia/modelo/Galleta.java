@@ -7,6 +7,7 @@ public class Galleta extends Producto implements Serializable {
 
   // Atributo que indica si la galleta tiene chispas de chocolate
   private boolean tieneChispas;
+  private static final long serialVersionUID = 1L;
 
   // Constructor que recibe los parámetros básicos más si tiene chispas
   public Galleta(String nombre, double precioVenta, double costoProduccion, int cantidad, boolean tieneChispas) {
@@ -27,6 +28,11 @@ public class Galleta extends Producto implements Serializable {
     return tieneChispas;
   }
 
+
+  @Override
+  public String toString() {
+    return getDescripcion();
+  }
   // Método setter para modificar si la galleta tiene chispas
   public void setTieneChispas(boolean tieneChispas) {
     this.tieneChispas = tieneChispas;
