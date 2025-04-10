@@ -244,10 +244,4 @@ public class ControladorInventario {
         return ventas;
     }
 
-
-
-
-
-
-
 }
