@@ -1,13 +1,11 @@
 package panaderia.controlador;
 
 import panaderia.modelo.Producto;
-import panaderia.modelo.reporte.Venta;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
+import panaderia.vista.VentaUI;
 
 public class ControladorVista {
     private final ControladorInventario controlador;
@@ -25,39 +23,17 @@ public class ControladorVista {
     }
 
     public void guardarReportes(JFrame frame) {
-        controlador.guardarReporteConFecha();
+        //controlador.guardarReporteConFecha();
         controlador.guardarReporteVentasConFecha();
         mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 
     public void mostrarVentas(JFrame frame) {
-        DefaultTableModel modeloVentas = new DefaultTableModel(new Object[]{
-                "Fecha", "Producto", "Cantidad", "Precio Unitario", "Total"
-        }, 0);
-
-        List<Venta> ventas = VentasSerializable.cargarVentas();
-        for (Venta v : ventas) {
-            for (Producto p : v.getProductos()) {
-                Object[] fila = new Object[]{
-                        v.getFecha(),
-                        p.getNombre(),
-                        p.getCantidad(),
-                        p.getPrecioVenta(),
-                        p.getCantidad() * p.getPrecioVenta()
-                };
-                modeloVentas.addRow(fila);
-            }
-        }
-
-        if (modeloVentas.getRowCount() == 0) {
-            mostrarMensaje(frame, "No hay ventas registradas.", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        JTable tablaVentas = new JTable(modeloVentas);
-        JScrollPane scrollPane = new JScrollPane(tablaVentas);
-        JOptionPane.showMessageDialog(frame, scrollPane, "Ventas realizadas", JOptionPane.INFORMATION_MESSAGE);
+        VentaUI.mostrarTablaVentas(frame);
     }
+
+
+
 
     public void aplicarFiltros(String nombre, String precioTexto, String cantidadTexto, Consumer<List<Producto>> callback, Consumer<String> onError) {
         nombre = nombre.trim();

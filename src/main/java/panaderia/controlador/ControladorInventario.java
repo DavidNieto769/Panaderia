@@ -1,65 +1,65 @@
 package panaderia.controlador;
 
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.awt.Component;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import panaderia.modelo.Galleta;
-import panaderia.modelo.Pan;
-import panaderia.modelo.Producto;
+import panaderia.modelo.*;
 import panaderia.modelo.reporte.*;
-import panaderia.vista.FormularioProducto;
-
-import javax.swing.*;
+import panaderia.dao.GalletaDAO;
+import panaderia.dao.PanDAO;
+import panaderia.persistencia.ArchivoBinario;
+import panaderia.controlador.util.ResultadoOperacion;
+import panaderia.vista.VentaUI;
 
 public class ControladorInventario {
- 
+
     private Inventario inventario;
+    private PanDAO panDAO;
+    private GalletaDAO galletaDAO;
 
     public ControladorInventario() {
         this.inventario = new Inventario();
+        this.panDAO = new PanDAO();
+        this.galletaDAO = new GalletaDAO();
 
-        // Se cargan automáticamente los productos desde el archivo productos.csv
-        List<Producto> productosCargados = InventarioSerializable.cargarProductosSerializable();
+        inventario.getProductos().clear();
+
+        List<Producto> productosCargados = new ArrayList<>();
+        productosCargados.addAll(panDAO.obtenerTodos());
+        productosCargados.addAll(galletaDAO.obtenerTodos());
+
         for (Producto p : productosCargados) {
             inventario.agregarProducto(p);
         }
     }
 
-    // Método para agregar un producto al inventario
     public void agregarProducto(Producto producto) {
         inventario.agregarProducto(producto);
+
+        if (producto instanceof Pan) {
+            panDAO.insertar(producto, getSoloPanes());
+        } else if (producto instanceof Galleta) {
+            galletaDAO.insertar(producto, getSoloGalletas());
+        }
     }
 
-    // Método que devuelve la lista completa de productos del inventario
     public List<Producto> obtenerProductos() {
         return inventario.getProductos();
     }
 
-    // Método para aplicar filtros sobre los productos del inventario por nombre, precio máximo o cantidad mínima
     public List<Producto> filtrar(String nombre, String precioMax, String cantidadMin) {
-        // Iniciar con todos los productos del inventario
         List<Producto> filtrados = inventario.getProductos();
 
-        // Se filtra por nombre si no está vacío
         if (!nombre.isEmpty()) {
             filtrados = filtrados.stream()
                     .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                     .collect(Collectors.toList());
         }
 
-        // Se filtra por precio máximo si se proporciona un valor válido
         if (!precioMax.isEmpty()) {
             try {
                 double max = Double.parseDouble(precioMax);
@@ -67,11 +67,10 @@ public class ControladorInventario {
                         .filter(p -> p.getPrecioVenta() <= max)
                         .collect(Collectors.toList());
             } catch (NumberFormatException e) {
-                System.out.println("Precio inválido.");
+                // Error silencioso, podrías notificar a la vista si deseas
             }
         }
 
-        // Se filtra por cantidad mínima si se proporciona un valor válido
         if (!cantidadMin.isEmpty()) {
             try {
                 int min = Integer.parseInt(cantidadMin);
@@ -79,29 +78,13 @@ public class ControladorInventario {
                         .filter(p -> p.getCantidad() >= min)
                         .collect(Collectors.toList());
             } catch (NumberFormatException e) {
-                System.out.println("Cantidad inválida.");
+                // Error silencioso, podrías notificar a la vista si deseas
             }
         }
 
         return filtrados;
     }
 
-
-    // Método que guarda el estado actual del inventario en un archivo CSV especificado por el usuario
-    public void guardarSerializable() {
-        InventarioSerializable.guardarProductosSerializable(inventario.getProductos());
-    }
-
-
-
-    // Método que genera un reporte del inventario y lo guarda con la fecha y hora actuales en el nombre del archivo
-    public void guardarReporteConFecha() {
-        String fecha = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        String nombreArchivo = "reporteInventario-" + fecha + ".ser";
-        InventarioSerializable.guardarProductosSerializable(inventario.getProductos());
-    }
-
-    // Método que crea una copia del reporte de ventas con una marca de tiempo para conservar versiones históricas
     public void guardarReporteVentasConFecha() {
         String fecha = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
         String nombreCopia = "reporteVentas-" + fecha + ".ser";
@@ -111,137 +94,92 @@ public class ControladorInventario {
             Path destino = Paths.get(nombreCopia);
             Files.copy(origen, destino, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
+        }
+    }
+
+    public void guardarSerializable(Producto producto) {
+        if (producto instanceof Pan) {
+            panDAO.insertar(producto, getSoloPanes());
+        } else if (producto instanceof Galleta) {
+            galletaDAO.insertar(producto, getSoloGalletas());
         }
     }
 
     public void crearProducto(Component parentComponent, Runnable actualizarVista) {
         try {
-            Producto producto = FormularioProducto.mostrarDialogo(parentComponent);
+            Producto producto = VentaUI.solicitarProducto(parentComponent);
             if (producto != null) {
                 agregarProducto(producto);
-                guardarSerializable();
+                guardarSerializable(producto);
                 if (actualizarVista != null) actualizarVista.run();
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(parentComponent, "Error al crear producto: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            VentaUI.mostrarError(parentComponent, "Error al crear producto: " + ex.getMessage());
         }
     }
 
-
-    public boolean registrarVenta(String nombreProducto, int cantidadVendida, Component parentComponent) {
+    public ResultadoOperacion registrarVenta(String nombreProducto, int cantidadVendida) {
         Producto producto = inventario.getProductos().stream()
                 .filter(p -> p.getNombre().equals(nombreProducto))
                 .findFirst()
                 .orElse(null);
 
         if (producto == null) {
-            JOptionPane.showMessageDialog(parentComponent, "Producto no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return new ResultadoOperacion(false, "Producto no encontrado.");
         }
 
         if (producto.getCantidad() < cantidadVendida) {
-            JOptionPane.showMessageDialog(parentComponent, "No hay suficiente stock para realizar esta venta.", "Stock insuficiente", JOptionPane.WARNING_MESSAGE);
-            return false;
+            return new ResultadoOperacion(false, "No hay suficiente stock para realizar esta venta.");
         }
 
-        // Actualizar inventario
         producto.setCantidad(producto.getCantidad() - cantidadVendida);
-        guardarSerializable();
+        guardarSerializable(producto);
 
-        // Clonar el producto vendido según su tipo
-        Producto vendido;
-        if (producto instanceof Pan) {
-            vendido = new Pan(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra());
-        } else if (producto instanceof Galleta) {
-            vendido = new Galleta(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra());
-        } else {
-            JOptionPane.showMessageDialog(parentComponent, "Tipo de producto desconocido.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+        Producto vendido = (producto instanceof Pan)
+                ? new Pan(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra())
+                : new Galleta(producto.getNombre(), producto.getPrecioVenta(), producto.getCostoProduccion(), cantidadVendida, producto.isExtra());
 
-        // Registrar la venta
-        Venta venta = new Venta();
-        venta.agregarProducto(vendido);
-        VentasSerializable.guardarVenta(venta);
+        Venta nuevaVenta = new Venta(new Date(), List.of(vendido));
+        guardarVenta(nuevaVenta);
 
-        return true;
+        return new ResultadoOperacion(true, "Venta realizada con éxito.");
     }
 
+    public void guardarVenta(Venta venta) {
+        List<Venta> ventas = ArchivoBinario.<Venta>cargar("reporteVentas.ser");
+        ventas.add(venta);
+        ArchivoBinario.guardar("reporteVentas.ser", ventas);
+    }
 
     public void mostrarDialogoVenta(Component parentComponent, Runnable callbackActualizarTabla) {
-        // Se obtiene la lista de productos disponibles (con cantidad mayor a 0)
         List<Producto> disponibles = inventario.getProductos().stream()
                 .filter(p -> p.getCantidad() > 0)
                 .toList();
 
-        if (disponibles.isEmpty()) {
-            JOptionPane.showMessageDialog(parentComponent, "No hay productos disponibles para vender.");
-            return;
-        }
-
-        // ComboBox con los nombres de productos
-        JComboBox<String> combo = new JComboBox<>();
-        for (Producto p : disponibles) {
-            combo.addItem(p.getNombre());
-        }
-
-        JTextField campoCantidad = new JTextField();
-
-        JPanel panelVenta = new JPanel(new GridLayout(2, 2));
-        panelVenta.add(new JLabel("Producto:"));
-        panelVenta.add(combo);
-        panelVenta.add(new JLabel("Cantidad a vender:"));
-        panelVenta.add(campoCantidad);
-
-        int opcion = JOptionPane.showConfirmDialog(
-                parentComponent,
-                panelVenta,
-                "Venta de producto",
-                JOptionPane.OK_CANCEL_OPTION
-        );
-
-        if (opcion == JOptionPane.OK_OPTION) {
-            String productoSeleccionado = (String) combo.getSelectedItem();
-            String cantidadTexto = campoCantidad.getText().trim();
-
-            try {
-                int cantidad = Integer.parseInt(cantidadTexto);
-                if (cantidad <= 0) {
-                    throw new NumberFormatException("La cantidad debe ser mayor que cero.");
-                }
-
-                boolean exito = registrarVenta(productoSeleccionado, cantidad, parentComponent);
-                if (exito) {
-                    callbackActualizarTabla.run();
-                    JOptionPane.showMessageDialog(parentComponent, "Venta realizada con éxito.");
-                }
-
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(parentComponent, "Cantidad inválida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        VentaUI.mostrar(parentComponent, disponibles, (nombreProducto, cantidadVendida) -> {
+            ResultadoOperacion resultado = registrarVenta(nombreProducto, cantidadVendida);
+            VentaUI.mostrarMensaje(parentComponent, resultado.getMensaje());
+            if (resultado.isExito()) {
+                callbackActualizarTabla.run();
             }
-        }
+        });
     }
 
-
-    public List<String[]> obtenerVentas() {
-        List<String[]> ventas = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader("reporteVentas.ser"))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length == 5) {
-                    ventas.add(datos);
-                }
-            }
-        } catch (IOException e) {
-            // Puedes registrar el error si lo deseas o simplemente devolver la lista vacía
-            e.printStackTrace();
-        }
-
-        return ventas;
+    public Producto obtenerProductoPorNombre(String nombre) {
+        return inventario.buscarProductoPorNombre(nombre);
     }
 
+    // Métodos auxiliares para filtrar por tipo
+    private List<Producto> getSoloPanes() {
+        return inventario.getProductos().stream()
+                .filter(p -> p instanceof Pan)
+                .collect(Collectors.toList());
+    }
+
+    private List<Producto> getSoloGalletas() {
+        return inventario.getProductos().stream()
+                .filter(p -> p instanceof Galleta)
+                .collect(Collectors.toList());
+    }
 }
