@@ -20,6 +20,12 @@ public class Venta implements Serializable {
         this.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); // ⬅️ Asignar fecha actual al crear
     }
 
+    public Venta(Date fecha, List<Producto> productos) {
+        this.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(fecha);
+        this.productos = productos != null ? new ArrayList<>(productos) : new ArrayList<>();
+    }
+
+
     public void agregarProducto(Producto producto) {
         productos.add(producto);
     }

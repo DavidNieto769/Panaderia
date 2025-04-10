@@ -6,12 +6,15 @@ import java.util.stream.Collectors;
 
 import panaderia.modelo.Producto;
 
+
 public class Inventario {
+
     private List<Producto> productos;
 
     public Inventario() {
         this.productos = new ArrayList<>();
     }
+
 
     public void agregarProducto(Producto producto) {
         productos.add(producto);
@@ -19,6 +22,10 @@ public class Inventario {
 
     public List<Producto> getProductos() {
         return productos;
+    }
+
+    public void limpiar() {
+        productos.clear();
     }
 
     public Producto buscarProductoPorNombre(String nombre) {
@@ -47,8 +54,6 @@ public class Inventario {
             }
         }
     }
-
-  
 
     public List<Producto> filtrarPorNombre(String nombreParcial) {
         return productos.stream()

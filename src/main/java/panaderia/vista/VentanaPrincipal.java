@@ -67,12 +67,15 @@ public class VentanaPrincipal extends JFrame {
         Font fuente = new Font("Segoe UI", Font.PLAIN, 14);
 
 
-        JButton btnAgregar = ControladorVista.crearBotonRedondeado(" Agregar", "Agregar un nuevo producto al inventario");
+        JButton btnAgregar = ControladorVista.crearBotonRedondeado(" Agregar producto", "Agregar un nuevo producto al inventario");
         JButton btnFiltrar = ControladorVista.crearBotonRedondeado(" Filtrar", "Aplicar filtros según nombre, precio o cantidad");
-        JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar", "Limpiar todos los filtros");
-        JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Guardar", "Guardar reporte en archivo CSV");
-        JButton btnVender = ControladorVista.crearBotonRedondeado(" Vender", "Registrar la venta de un producto");
+        JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar filtro", "Limpiar todos los filtros");
+        JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Guardar Reporte", "Guardar reporte en archivo CSV");
+        JButton btnVender = ControladorVista.crearBotonRedondeado(" Vender producto", "Registrar la venta de un producto");
         JButton btnVerVentas = ControladorVista.crearBotonRedondeado(" Ver Ventas", "Mostrar historial de ventas");
+        JButton btnEditar = ControladorVista.crearBotonRedondeado(" Editar producto", "Editar el producto seleccionado");
+        JButton btnEliminar = ControladorVista.crearBotonRedondeado(" Eliminar producto", "Eliminar el producto seleccionado");
+
 
         btnAgregar.setToolTipText("Agregar un nuevo producto al inventario");
         btnFiltrar.setToolTipText("Aplicar filtros según nombre, precio o cantidad");
@@ -80,6 +83,8 @@ public class VentanaPrincipal extends JFrame {
         btnGuardar.setToolTipText("Guardar reporte en archivo CSV");
         btnVender.setToolTipText("Registrar la venta de un producto");
         btnVerVentas.setToolTipText("Mostrar historial de ventas");
+        btnEditar.setToolTipText("Editar producto");
+        btnEliminar.setToolTipText("Eliminar producto");
 
         btnAgregar.addActionListener(e ->
                 controladorVista.agregarProducto(this, () -> actualizarTabla(controladorVista.obtenerProductos()))
@@ -113,15 +118,29 @@ public class VentanaPrincipal extends JFrame {
                 controladorVista.guardarReportes(this)
         );
 
+
+
+
+        btnEditar.addActionListener(e -> {
+
+        });
+
+        btnEliminar.addActionListener(e -> {
+
+        });
+
         panelBotones.add(btnAgregar);
         panelBotones.add(btnFiltrar);
         panelBotones.add(btnLimpiar);
         panelBotones.add(btnGuardar);
         panelBotones.add(btnVender);
         panelBotones.add(btnVerVentas);
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnEliminar);
 
         return panelBotones;
     }
+
 
     private JPanel crearPanelFiltros() {
         JPanel panelFiltros = new JPanel();
@@ -160,6 +179,8 @@ public class VentanaPrincipal extends JFrame {
         return new JScrollPane(tabla);
     }
 
+
+
     private void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
         for (Producto p : lista) {
@@ -180,5 +201,11 @@ public class VentanaPrincipal extends JFrame {
         filtroPrecio.setText("");
         filtroCantidad.setText("");
     }
+
+
+
+
+
+
 
 }
