@@ -7,12 +7,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import panaderia.controlador.utilidades.ReporteVentasExporter;
 import panaderia.modelo.*;
 import panaderia.modelo.reporte.*;
 import panaderia.dao.GalletaDAO;
 import panaderia.dao.PanDAO;
 import panaderia.persistencia.ArchivoBinario;
-import panaderia.controlador.util.ResultadoOperacion;
+import panaderia.controlador.utilidades.ResultadoOperacion;
 import panaderia.vista.VentaUI;
 
 public class ControladorInventario {
@@ -85,18 +86,6 @@ public class ControladorInventario {
         return filtrados;
     }
 
-    public void guardarReporteVentasConFecha() {
-        String fecha = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        String nombreCopia = "reporteVentas-" + fecha + ".ser";
-
-        try {
-            Path origen = Paths.get("reporteVentas.ser");
-            Path destino = Paths.get(nombreCopia);
-            Files.copy(origen, destino, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void guardarSerializable(Producto producto) {
         if (producto instanceof Pan) {

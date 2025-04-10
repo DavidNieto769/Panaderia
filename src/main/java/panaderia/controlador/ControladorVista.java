@@ -1,14 +1,19 @@
 package panaderia.controlador;
 
+import panaderia.controlador.utilidades.ReporteVentasExporter;
+import panaderia.dao.VentaDAO;
 import panaderia.modelo.Producto;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
+
+import panaderia.modelo.reporte.Venta;
 import panaderia.vista.VentaUI;
 
 public class ControladorVista {
     private final ControladorInventario controlador;
+    private VentaDAO ventaDAO = new VentaDAO();
 
     public ControladorVista(ControladorInventario controlador) {
         this.controlador = controlador;
@@ -24,7 +29,7 @@ public class ControladorVista {
 
     public void guardarReportes(JFrame frame) {
         //controlador.guardarReporteConFecha();
-        controlador.guardarReporteVentasConFecha();
+        guardarReporteVentasCSV();
         mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 
@@ -113,6 +118,23 @@ public class ControladorVista {
         boton.setMargin(new Insets(6, 10, 6, 10)); // menos espacio
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return boton;
+    }
+
+    public void guardarReporteVentasCSV() {
+        List<Venta> ventas = ventaDAO.obtenerVentas();
+
+        if (ventas == null || ventas.isEmpty()) {
+            VentaUI.mostrarMensaje(null, "No hay ventas registradas para exportar.");
+            return;
+        }
+
+        boolean exito = ReporteVentasExporter.guardarComoCSV(ventas);
+
+        if (exito) {
+            VentaUI.mostrarMensaje(null, "Reporte CSV guardado exitosamente.");
+        } else {
+            VentaUI.mostrarError(null, "Error al guardar el reporte CSV.");
+        }
     }
 
 
