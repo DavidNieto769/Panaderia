@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import panaderia.modelo.reporte.Venta;
 import panaderia.vista.FormularioProducto;
+import panaderia.vista.ProductoUI;
 import panaderia.vista.VentaUI;
 
 public class ControladorVista {
@@ -39,8 +40,6 @@ public class ControladorVista {
     public void mostrarVentas(JFrame frame) {
         VentaUI.mostrarTablaVentas(frame);
     }
-
-
 
 
     public void aplicarFiltros(String nombre, String precioTexto, String cantidadTexto, Consumer<List<Producto>> callback, Consumer<String> onError) {
@@ -140,70 +139,15 @@ public class ControladorVista {
         }
     }
 
+
+
+
     public void eliminarProducto(JFrame frame, Runnable postAccion) {
-
-
-        List<Producto> productos = controlador.obtenerProductos();
-        // Verificamos si no hay productos
-        if (productos.isEmpty()) {
-            mostrarMensaje(frame, "No hay productos para eliminar.", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }        String[] nombres = productos.stream().map(Producto::getNombre).toArray(String[]::new);
-
-        String nombreSeleccionado = (String) JOptionPane.showInputDialog(
-                frame,
-                "Seleccione el producto a eliminar:",
-                "Eliminar Producto",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                nombres,
-                nombres.length > 0 ? nombres[0] : null
-        );
-
-        if (nombreSeleccionado != null) {
-            Producto producto = controlador.obtenerProductoPorNombre(nombreSeleccionado);
-            if (producto != null) {
-                controlador.eliminarProducto(producto);
-                mostrarMensaje(frame, "Producto eliminado correctamente.");
-                postAccion.run();
-            } else {
-                mostrarMensaje(frame, "Producto no encontrado.", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        ProductoUI.eliminarProducto(frame, controlador, postAccion);
     }
 
-
     public void editarProducto(JFrame frame, Runnable postAccion) {
-        List<Producto> productos = controlador.obtenerProductos();
-        String[] nombres = productos.stream().map(Producto::getNombre).toArray(String[]::new);
-
-        String nombreSeleccionado = (String) JOptionPane.showInputDialog(
-                frame,
-                "Seleccione el producto a editar:",
-                "Editar Producto",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                nombres,
-                nombres.length > 0 ? nombres[0] : null
-        );
-
-        if (nombreSeleccionado != null) {
-            Producto original = controlador.obtenerProductoPorNombre(nombreSeleccionado);
-            if (original != null) {
-                try {
-                    Producto editado = FormularioProducto.mostrarDialogo(frame, original);
-                    if (editado != null) {
-                        controlador.editarProducto(editado);
-                        mostrarMensaje(frame, "Producto editado correctamente.");
-                        postAccion.run();
-                    }
-                } catch (Exception ex) {
-                    mostrarMensaje(frame, "Error al editar producto: " + ex.getMessage(), JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                mostrarMensaje(frame, "Producto no encontrado.", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        ProductoUI.editarProducto(frame, controlador, postAccion);
     }
 
 

@@ -2,6 +2,8 @@ package panaderia.vista;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import java.awt.*;
@@ -33,6 +35,7 @@ public class VentanaPrincipal extends JFrame {
 
         initComponents();
         actualizarTabla(controladorVista.obtenerProductos());
+        configurarFiltrosDinamicos();
     }
 
     private void initComponents() {
@@ -68,7 +71,6 @@ public class VentanaPrincipal extends JFrame {
 
 
         JButton btnAgregar = ControladorVista.crearBotonRedondeado(" Agregar producto", "Agregar un nuevo producto al inventario");
-        JButton btnFiltrar = ControladorVista.crearBotonRedondeado(" Filtrar", "Aplicar filtros según nombre, precio o cantidad");
         JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar filtro", "Limpiar todos los filtros");
         JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Guardar Reporte", "Guardar reporte en archivo CSV");
         JButton btnVender = ControladorVista.crearBotonRedondeado(" Vender producto", "Registrar la venta de un producto");
@@ -78,7 +80,6 @@ public class VentanaPrincipal extends JFrame {
 
 
         btnAgregar.setToolTipText("Agregar un nuevo producto al inventario");
-        btnFiltrar.setToolTipText("Aplicar filtros según nombre, precio o cantidad");
         btnLimpiar.setToolTipText("Limpiar todos los filtros");
         btnGuardar.setToolTipText("Guardar reporte en archivo CSV");
         btnVender.setToolTipText("Registrar la venta de un producto");
@@ -98,15 +99,7 @@ public class VentanaPrincipal extends JFrame {
                 controladorVista.mostrarVentas(this)
         );
 
-        btnFiltrar.addActionListener(e ->
-                controladorVista.aplicarFiltros(
-                        filtroNombre.getText(),
-                        filtroPrecio.getText(),
-                        filtroCantidad.getText(),
-                        this::actualizarTabla,
-                        mensajeError -> JOptionPane.showMessageDialog(this, mensajeError, "Error", JOptionPane.ERROR_MESSAGE)
-                )
-        );
+
 
         btnLimpiar.addActionListener(e -> {
             limpiarFiltros();
@@ -134,7 +127,6 @@ public class VentanaPrincipal extends JFrame {
 
 
         panelBotones.add(btnAgregar);
-        panelBotones.add(btnFiltrar);
         panelBotones.add(btnLimpiar);
         panelBotones.add(btnGuardar);
         panelBotones.add(btnVender);
@@ -166,6 +158,47 @@ public class VentanaPrincipal extends JFrame {
 
         return panelFiltros;
     }
+
+    private void configurarFiltrosDinamicos() {
+        // Timer que se reinicia cada vez que el usuario escribe
+        Timer debounceTimer = new Timer(500, e -> {
+            controladorVista.aplicarFiltros(
+                    filtroNombre.getText(),
+                    filtroPrecio.getText(),
+                    filtroCantidad.getText(),
+                    this::actualizarTabla,
+                    mensajeError -> {
+                        // puedes mostrar esto en un JLabel si quieres
+                        System.out.println("Error de filtro: " + mensajeError);
+                    }
+            );
+        });
+
+        debounceTimer.setRepeats(false); // para que solo se dispare una vez después del delay
+
+        DocumentListener listener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                debounceTimer.restart(); // reinicia el delay cada vez que se escribe
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                debounceTimer.restart();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                debounceTimer.restart();
+            }
+        };
+
+        filtroNombre.getDocument().addDocumentListener(listener);
+        filtroPrecio.getDocument().addDocumentListener(listener);
+        filtroCantidad.getDocument().addDocumentListener(listener);
+    }
+
+
 
     private JScrollPane crearTablaScroll() {
         modeloTabla = new DefaultTableModel(new Object[]{"Nombre", "Precio", "Costo", "Cantidad", "Extra"}, 0) {

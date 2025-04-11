@@ -1,13 +1,9 @@
 package panaderia.controlador;
 
 import java.awt.Component;
-import java.io.IOException;
-import java.nio.file.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import panaderia.controlador.utilidades.ReporteVentasExporter;
 import panaderia.modelo.*;
 import panaderia.modelo.reporte.*;
 import panaderia.dao.GalletaDAO;
@@ -27,7 +23,7 @@ public class ControladorInventario {
         this.panDAO = new PanDAO();
         this.galletaDAO = new GalletaDAO();
 
-        inventario.getProductos().clear();
+        inventario.obtenerProductos().clear();
 
         List<Producto> productosCargados = new ArrayList<>();
         productosCargados.addAll(panDAO.obtenerTodos());
@@ -52,8 +48,9 @@ public class ControladorInventario {
         return inventario.getProductos();
     }
 
+
     public List<Producto> filtrar(String nombre, String precioMax, String cantidadMin) {
-        List<Producto> filtrados = inventario.getProductos();
+        List<Producto> filtrados = inventario.obtenerProductos();
 
         if (!nombre.isEmpty()) {
             filtrados = filtrados.stream()
@@ -95,13 +92,16 @@ public class ControladorInventario {
         }
     }
 
-    public void editarProducto(Producto productoEditado) {
+    public void editarProducto(String nombreAnterior, Producto productoEditado) {
+        inventario.eliminarProducto(nombreAnterior);
+
         if (productoEditado instanceof Pan) {
             panDAO.insertar(productoEditado, panDAO.obtenerTodos());
         } else if (productoEditado instanceof Galleta) {
             galletaDAO.insertar(productoEditado, galletaDAO.obtenerTodos());
         }
-        sincronizarInventario(); // igual que en eliminar
+
+        inventario.agregarProducto(productoEditado);
     }
 
 
@@ -126,7 +126,6 @@ public class ControladorInventario {
 
 
 
-
     public void crearProducto(Component parentComponent, Runnable actualizarVista) {
         try {
             Producto producto = VentaUI.mostrarDialogoNuevo(parentComponent);
@@ -141,7 +140,7 @@ public class ControladorInventario {
     }
 
     public ResultadoOperacion registrarVenta(String nombreProducto, int cantidadVendida) {
-        Producto producto = inventario.getProductos().stream()
+        Producto producto = inventario.obtenerProductos().stream()
                 .filter(p -> p.getNombre().equals(nombreProducto))
                 .findFirst()
                 .orElse(null);
@@ -174,7 +173,7 @@ public class ControladorInventario {
     }
 
     public void mostrarDialogoVenta(Component parentComponent, Runnable callbackActualizarTabla) {
-        List<Producto> disponibles = inventario.getProductos().stream()
+        List<Producto> disponibles = inventario.obtenerProductos().stream()
                 .filter(p -> p.getCantidad() > 0)
                 .toList();
 
@@ -193,13 +192,13 @@ public class ControladorInventario {
 
     // Métodos auxiliares para filtrar por tipo
     private List<Producto> getSoloPanes() {
-        return inventario.getProductos().stream()
+        return inventario.obtenerProductos().stream()
                 .filter(p -> p instanceof Pan)
                 .collect(Collectors.toList());
     }
 
     private List<Producto> getSoloGalletas() {
-        return inventario.getProductos().stream()
+        return inventario.obtenerProductos().stream()
                 .filter(p -> p instanceof Galleta)
                 .collect(Collectors.toList());
     }
