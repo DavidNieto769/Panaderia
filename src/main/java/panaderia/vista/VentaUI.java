@@ -16,6 +16,21 @@ public class VentaUI {
             return;
         }
 
+        String input = JOptionPane.showInputDialog(null, "Cuántos productos desea vender:", "Número requerido", JOptionPane.QUESTION_MESSAGE);
+        if (input != null) {
+            try {
+                int numero = Integer.parseInt(input);
+                // Usar la variable 'numero' como desees
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Por favor, ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        for (int i = 0; i <= Integer.parseInt(input); i++) {
+
+
+
+
         JComboBox<String> combo = new JComboBox<>();
         for (Producto p : productosDisponibles) {
             combo.addItem(p.getNombre());
@@ -51,7 +66,7 @@ public class VentaUI {
             }
         }
     }
-
+}
 
 
     // Para crear un nuevo producto

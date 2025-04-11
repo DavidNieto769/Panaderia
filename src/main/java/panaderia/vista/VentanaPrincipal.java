@@ -23,7 +23,7 @@ public class VentanaPrincipal extends JFrame {
 
     private JTable tabla;
     private DefaultTableModel modeloTabla;
-
+    private int numeroProductos = 0;
     private JTextField filtroNombre, filtroPrecio, filtroCantidad;
 
     public VentanaPrincipal() {
@@ -95,7 +95,7 @@ public class VentanaPrincipal extends JFrame {
         );
 
         btnVender.addActionListener(e ->
-                controladorVista.venderProducto(this, () -> actualizarTabla(controladorVista.obtenerProductos()))
+                           controladorVista.venderProducto(this, () -> actualizarTabla(controladorVista.obtenerProductos()))
         );
 
         btnVerVentas.addActionListener(e ->
