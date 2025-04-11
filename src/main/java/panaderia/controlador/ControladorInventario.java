@@ -22,6 +22,7 @@ public class ControladorInventario {
         this.inventario = new Inventario();
         this.panDAO = new PanDAO();
         this.galletaDAO = new GalletaDAO();
+        // Carga los productos desde archivos binarios al iniciar el sistema
 
         inventario.obtenerProductos().clear();
 
@@ -36,7 +37,7 @@ public class ControladorInventario {
 
     public void agregarProducto(Producto producto) {
         inventario.agregarProducto(producto);
-
+        // Guarda el producto en su archivo correspondiente
         if (producto instanceof Pan) {
             panDAO.insertar(producto, getSoloPanes());
         } else if (producto instanceof Galleta) {
@@ -57,7 +58,7 @@ public class ControladorInventario {
                     .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                     .collect(Collectors.toList());
         }
-
+        // Filtra por nombre si no está vacío
         if (!precioMax.isEmpty()) {
             try {
                 double max = Double.parseDouble(precioMax);
@@ -65,10 +66,10 @@ public class ControladorInventario {
                         .filter(p -> p.getPrecioVenta() <= max)
                         .collect(Collectors.toList());
             } catch (NumberFormatException e) {
-                // Error silencioso, podrías notificar a la vista si deseas
+                // Error silencioso"
             }
         }
-
+        // Filtra por cantidad mínima, si es válida
         if (!cantidadMin.isEmpty()) {
             try {
                 int min = Integer.parseInt(cantidadMin);
@@ -83,7 +84,7 @@ public class ControladorInventario {
         return filtrados;
     }
 
-
+    // Guarda el producto en archivo .ser según su tipo
     public void guardarSerializable(Producto producto) {
         if (producto instanceof Pan) {
             panDAO.insertar(producto, getSoloPanes());
@@ -93,6 +94,7 @@ public class ControladorInventario {
     }
 
     public void editarProducto(String nombreAnterior, Producto productoEditado) {
+        // Reemplaza el producto anterior por el nuevo
         inventario.eliminarProducto(nombreAnterior);
 
         if (productoEditado instanceof Pan) {
@@ -112,11 +114,11 @@ public class ControladorInventario {
         } else if (producto instanceof Galleta) {
             galletaDAO.eliminar((Galleta) producto);
         }
-        sincronizarInventario(); // muy importante para reflejar los cambios
+        sincronizarInventario(); // Refresca los datos en memoria tras eliminar
     }
 
 
-
+    //inventario desde archivos serializados
     public void sincronizarInventario() {
         inventario.limpiar();
         inventario.getProductos().addAll(panDAO.obtenerTodos());
@@ -138,6 +140,7 @@ public class ControladorInventario {
             VentaUI.mostrarError(parentComponent, "Error al crear producto: Debes llenar todos los espacios ");
         }
     }
+// Registra una venta y actualiza inventario y archivo de ventas
 
     public ResultadoOperacion registrarVenta(String nombreProducto, int cantidadVendida) {
         Producto producto = inventario.obtenerProductos().stream()
@@ -167,6 +170,7 @@ public class ControladorInventario {
     }
 
     public void guardarVenta(Venta venta) {
+        // Agrega una venta nueva al archivo de ventas serializadas
         List<Venta> ventas = ArchivoBinario.<Venta>cargar("reporteVentas.ser");
         ventas.add(venta);
         ArchivoBinario.guardar("reporteVentas.ser", ventas);
@@ -190,7 +194,7 @@ public class ControladorInventario {
         return inventario.buscarProductoPorNombre(nombre);
     }
 
-    // Métodos auxiliares para filtrar por tipo
+    // Métodos auxiliares para filtrar los productos según su tipo
     private List<Producto> getSoloPanes() {
         return inventario.obtenerProductos().stream()
                 .filter(p -> p instanceof Pan)

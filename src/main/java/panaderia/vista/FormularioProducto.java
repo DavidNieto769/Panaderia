@@ -10,10 +10,11 @@ import panaderia.fabrica.*;
 
 public class FormularioProducto {
 
+    // Muestra un formulario para crear o editar un producto, devolviendo el objeto resultante
     public static Producto mostrarDialogo(Component parent, Producto productoExistente) throws Exception {
         String tipo = "Pan"; // Valor por defecto
 
-        // Preguntar el tipo solo si es un producto nuevo
+        // Determina el tipo de producto según la acción: nuevo o edición
         if (productoExistente == null) {
             String[] opciones = {"Pan", "Galleta"};
             tipo = (String) JOptionPane.showInputDialog(
@@ -26,11 +27,12 @@ public class FormularioProducto {
                     opciones[0]
             );
 
-            if (tipo == null) return null; // Cancelado
+            if (tipo == null) return null; // Si se cancela el diálogo, retorna null
         } else {
             tipo = productoExistente instanceof Pan ? "Pan" : "Galleta";
         }
 
+        // Campos del formulario con filtros de validación
         JTextField nombre = new JTextField(productoExistente != null ? productoExistente.getNombre() : "");
         ((AbstractDocument) nombre.getDocument()).setDocumentFilter(new FiltroTexto.SoloLetras());
         JTextField precio = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getPrecioVenta()) : "");
@@ -40,8 +42,7 @@ public class FormularioProducto {
         JTextField cantidad = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getCantidad()) : "");
         ((AbstractDocument) cantidad.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
 
-
-
+        // Campo extra específico según el tipo de producto
         JCheckBox extra;
         if (tipo.equals("Pan")) {
             boolean tieneQueso = productoExistente instanceof Pan && ((Pan) productoExistente).isTieneQueso();
@@ -51,6 +52,7 @@ public class FormularioProducto {
             extra = new JCheckBox("¿Tiene chispas de chocolate?", tieneChispas);
         }
 
+        // Construcción del formulario
         Object[] campos = {
                 "Nombre:", nombre,
                 "Precio:", precio,
@@ -69,10 +71,11 @@ public class FormularioProducto {
             int cant = Integer.parseInt(cantidad.getText());
             boolean conExtra = extra.isSelected();
 
+            // Se utiliza la fábrica adecuada para crear el producto
             Panaderia factory = tipo.equals("Pan") ? new PanFactory() : new GalletaFactory();
             return factory.hornear(nom, p, c, cant, conExtra);
         }
 
-        return null;
+        return null; // Si se cancela, no se crea producto
     }
 }

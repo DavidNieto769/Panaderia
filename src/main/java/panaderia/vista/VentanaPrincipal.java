@@ -15,7 +15,6 @@ import panaderia.controlador.ControladorInventario;
 import panaderia.controlador.ControladorVista;
 import panaderia.controlador.utilidades.FiltroTexto;
 import panaderia.modelo.Producto;
-import panaderia.controlador.utilidades.FiltroSoloLetras;
 
 
 public class VentanaPrincipal extends JFrame {
@@ -23,14 +22,13 @@ public class VentanaPrincipal extends JFrame {
 
     private JTable tabla;
     private DefaultTableModel modeloTabla;
-    private int numeroProductos = 0;
     private JTextField filtroNombre, filtroPrecio, filtroCantidad;
 
     public VentanaPrincipal() {
         ControladorInventario controlador = new ControladorInventario();
         controladorVista = new ControladorVista(controlador);
 
-        setTitle("Gestión de Panadería");
+        setTitle("Gestión de Panadería UD");
         setSize(800, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

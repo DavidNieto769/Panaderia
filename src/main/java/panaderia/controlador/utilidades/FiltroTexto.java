@@ -5,9 +5,9 @@ import javax.swing.text.*;
 
 public class FiltroTexto {
 
-    // Filtro para solo letras
+    // Filtro para permitir solo letras en campos de texto
     public static class SoloLetras extends DocumentFilter {
-
+    // Verifica si la cadena contiene solo letras
         @Override
         public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
             if (string == null || string.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*")) {
@@ -18,7 +18,9 @@ public class FiltroTexto {
         }
 
         @Override
+
         public void replace(FilterBypass fb, int offset, int length, String string, AttributeSet attrs) throws BadLocationException {
+            // Reemplazo condicionado al ingreso de solo letras
             if (string == null || string.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*")) {
                 super.replace(fb, offset, length, string, attrs);
             } else {
@@ -27,7 +29,8 @@ public class FiltroTexto {
         }
     }
 
-    // Filtro para solo números
+
+    // Filtro para permitir solo números en campos de texto
     public static class SoloNumeros extends DocumentFilter {
 
         @Override
@@ -49,7 +52,7 @@ public class FiltroTexto {
         }
     }
 
-    // Método compartido para mostrar advertencias
+    //Muestra una advertencia en un cuadro de diálogo en el hilo de la interfaz gráfica
     private static void mostrarAdvertencia(String mensaje) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(null, mensaje, "Entrada no válida", JOptionPane.WARNING_MESSAGE);

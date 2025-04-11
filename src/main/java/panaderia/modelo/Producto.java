@@ -49,7 +49,7 @@ public abstract class Producto implements Serializable {
   }
 
   /**
-   * Valida que el precio de venta no sea menor al costo de producción.
+   * valida que el precio de venta no sea menor al costo de producción.
    * Esta validación se hace solo si el costo ya ha sido asignado previamente.
    */
   public void setPrecioVenta(double precioVenta) {

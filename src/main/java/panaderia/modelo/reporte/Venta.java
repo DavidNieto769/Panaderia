@@ -13,11 +13,11 @@ public class Venta implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private List<Producto> productos;
-    private String fecha; // ⬅️ Nuevo atributo
+    private String fecha; // Fecha en la que se realizó la venta
 
     public Venta() {
         this.productos = new ArrayList<>();
-        this.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); // ⬅️ Asignar fecha actual al crear
+        this.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); // Asigna la fecha actual al crear la venta
     }
 
     public Venta(Date fecha, List<Producto> productos) {
@@ -25,11 +25,12 @@ public class Venta implements Serializable {
         this.productos = productos != null ? new ArrayList<>(productos) : new ArrayList<>();
     }
 
-
+    // Agrega un producto a la lista de la venta
     public void agregarProducto(Producto producto) {
         productos.add(producto);
     }
 
+    // Devuelve la lista completa de productos en la venta
     public List<Producto> getProductos() {
         return productos;
     }
@@ -38,6 +39,7 @@ public class Venta implements Serializable {
         return fecha;
     }
 
+    // Busca un producto en la venta por su nombre
     public Producto buscarProductoPorNombre(String nombre) {
         for (Producto p : productos) {
             if (p.getNombre().equalsIgnoreCase(nombre)) {
@@ -47,6 +49,7 @@ public class Venta implements Serializable {
         return null;
     }
 
+    // Calcula el valor total de la venta sumando (precio * cantidad) de cada producto
     public double calcularValorTotal() {
         double total = 0;
         for (Producto p : productos) {
@@ -55,6 +58,7 @@ public class Venta implements Serializable {
         return total;
     }
 
+    // Imprime en consola los productos de la venta con su descripción y cantidad
     public void listarProductos() {
         if (productos.isEmpty()) {
             System.out.println("Inventario vacío.");
@@ -65,18 +69,21 @@ public class Venta implements Serializable {
         }
     }
 
+    // Filtra productos cuyo nombre contenga una subcadena específica
     public List<Producto> filtrarPorNombre(String nombreParcial) {
         return productos.stream()
                 .filter(p -> p.getNombre().toLowerCase().contains(nombreParcial.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
+    // Filtra productos cuyo precio sea menor o igual al máximo especificado
     public List<Producto> filtrarPorPrecioMaximo(double precioMaximo) {
         return productos.stream()
                 .filter(p -> p.getPrecioVenta() <= precioMaximo)
                 .collect(Collectors.toList());
     }
 
+    // Filtra productos cuya cantidad sea igual o superior a la mínima requerida
     public List<Producto> filtrarPorCantidadMinima(int cantidadMinima) {
         return productos.stream()
                 .filter(p -> p.getCantidad() >= cantidadMinima)

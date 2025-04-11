@@ -1,5 +1,6 @@
 package panaderia.controlador.utilidades;
 
+// Representa el resultado de una operación con estado de éxito y mensaje opcional
 public class ResultadoOperacion {
     private boolean exito;
     private String mensaje;

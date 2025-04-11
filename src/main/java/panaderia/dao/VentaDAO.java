@@ -14,6 +14,5 @@ public class VentaDAO {
     }
 
     public void guardarVentas(List<Venta> ventas) {
-       // ArchivoBinario.guardar(ventas, archivoVentas);
     }
 }
