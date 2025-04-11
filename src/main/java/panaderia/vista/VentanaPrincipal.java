@@ -56,20 +56,16 @@ public class VentanaPrincipal extends JFrame {
     }
 
 
-
-
     private JPanel crearPanelBotones() {
 
 
-        JPanel panelBotones = new JPanel(new GridLayout(2, 4, 10, 10)); // 3x3 con espacios
+        JPanel panelBotones = new JPanel(new GridLayout(2, 4, 10, 10)); // 3x3
         panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-     //   panelBotones.setBackground(new Color(43, 43, 43)); // Fondo oscuro opcional
-
         panelBotones.setBackground(new Color(230, 255, 240)); // verde pastel
 
         // Colores personalizados
-        Color fondoBoton = new Color(60, 63, 65);       // gris oscuro elegante
-        Color textoBoton = new Color(230, 230, 230);    // texto claro
+        Color fondoBoton = new Color(60, 63, 65);
+        Color textoBoton = new Color(230, 230, 230);
         Font fuente = new Font("Segoe UI", Font.PLAIN, 16);
 
 
@@ -119,8 +115,6 @@ public class VentanaPrincipal extends JFrame {
         });
 
 
-
-
         panelBotones.add(btnAgregar);
         panelBotones.add(btnGuardar);
         panelBotones.add(btnVender);
@@ -135,19 +129,19 @@ public class VentanaPrincipal extends JFrame {
     private JPanel crearPanelFiltros() {
         JPanel panelFiltros = new JPanel();
 
-        // Borde más grueso y con color personalizado
-        Border lineaGruesa = BorderFactory.createLineBorder(new Color(40, 120, 90), 2); // verde bosque, grosor 2px
+        // Borde y con color personalizado
+        Border lineaGruesa = BorderFactory.createLineBorder(new Color(40, 120, 90), 2); // verde
         TitledBorder borde = BorderFactory.createTitledBorder(
                 lineaGruesa, "Filtros de búsqueda", TitledBorder.LEFT, TitledBorder.TOP,
-                new Font("Segoe UI", Font.BOLD, 16), new Color(40, 120, 90)); // verde bosque
+                new Font("Segoe UI", Font.BOLD, 16), new Color(40, 120, 90)); // verde
 
         panelFiltros.setBorder(borde);
 
-        Font fuente = new Font("Segoe UI", Font.BOLD, 16); // Fuente moderna y clara
+        Font fuente = new Font("Segoe UI", Font.BOLD, 16); // Fuente
 
         filtroNombre = new JTextField(10);
         filtroNombre.setFont(fuente);
-        //((AbstractDocument) filtroNombre.getDocument()).setDocumentFilter(new FiltroSoloLetras());
+        //Filtro para solo admitir letras
         ((AbstractDocument) filtroNombre.getDocument()).setDocumentFilter(new FiltroTexto.SoloLetras());
 
 
@@ -178,7 +172,7 @@ public class VentanaPrincipal extends JFrame {
         labelCantidad.setFont(fuente);
         labelCantidad.setForeground(new Color(40, 120, 90));
 
-        panelFiltros.setBackground(new Color(255,255,255)); // verde muy claro
+        panelFiltros.setBackground(new Color(255,255,255)); // blanco
 
         panelFiltros.add(labelNombre);
         panelFiltros.add(filtroNombre);
@@ -202,13 +196,12 @@ public class VentanaPrincipal extends JFrame {
                     filtroCantidad.getText(),
                     this::actualizarTabla,
                     mensajeError -> {
-                        // puedes mostrar esto en un JLabel si quieres
                         System.out.println("Error de filtro: " + mensajeError);
                     }
             );
         });
 
-        debounceTimer.setRepeats(false); // para que solo se dispare una vez después del delay
+        debounceTimer.setRepeats(false); // una vez después del delay
 
         DocumentListener listener = new DocumentListener() {
             @Override
@@ -247,9 +240,9 @@ public class VentanaPrincipal extends JFrame {
         tabla = new JTable(modeloTabla);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.getTableHeader().setReorderingAllowed(false);
-        tabla.setRowHeight(30); // un poco más alta para letra grande
+        tabla.setRowHeight(30); // letra grande
 
-        // Mostrar cuadrícula con color gris claro
+        // Mostrar cuadrícula
         tabla.setShowGrid(true);
         tabla.setGridColor(new Color(220, 220, 220));
         tabla.setIntercellSpacing(new Dimension(1, 1));
@@ -260,7 +253,7 @@ public class VentanaPrincipal extends JFrame {
         tabla.setBackground(new Color(245, 255, 250));
         tabla.setForeground(new Color(20, 60, 50));
 
-        // === Encabezado con letra grande y en negrita ===
+        //Encabezado con letra grande y en negrita
         Font fuenteEncabezado = tabla.getTableHeader().getFont().deriveFont(Font.BOLD, 16f);
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
             @Override
@@ -282,7 +275,7 @@ public class VentanaPrincipal extends JFrame {
             tabla.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
         }
 
-        // === Celdas con letra grande ===
+        // Celdas con letra grande
         Font fuenteCeldas = tabla.getFont().deriveFont(16);
         tabla.setFont(fuenteCeldas);
 
@@ -296,11 +289,6 @@ public class VentanaPrincipal extends JFrame {
 
         return new JScrollPane(tabla);
     }
-
-
-
-
-
 
     private void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
@@ -322,6 +310,4 @@ public class VentanaPrincipal extends JFrame {
         filtroPrecio.setText("");
         filtroCantidad.setText("");
     }
-
-
 }

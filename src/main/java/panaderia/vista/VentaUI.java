@@ -110,7 +110,6 @@ public class VentaUI {
     }
 
 
-
     public static void mostrar(Component parentComponent, List<Producto> productosDisponibles, VentaCallback callback) {
         if (productosDisponibles.isEmpty()) {
             JOptionPane.showMessageDialog(parentComponent, "No hay productos disponibles para vender.");
@@ -138,16 +137,16 @@ public class VentaUI {
                 ((AbstractDocument) camposCantidad[i].getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
             }
 
-// Función para actualizar dinámicamente los combos
+            // Función para actualizar dinámicamente los combos
             Runnable actualizarCombos = () -> actualizarCombos(combos, productosDisponibles);
 
 
-// Agregamos listener a todos los combos
+            // Agregar listener a todos los combos
             for (JComboBox<String> combo : combos) {
                 combo.addActionListener(e -> actualizarCombos.run());
             }
 
-// Llenamos inicialmente los combos
+            // Llenar inicialmente los combos
             actualizarCombos.run();
 
             int opcion = JOptionPane.showConfirmDialog(parentComponent, panel, "Registrar Ventas", JOptionPane.OK_CANCEL_OPTION);
@@ -170,7 +169,6 @@ public class VentaUI {
             if (continuar != JOptionPane.YES_OPTION) break;
         }
     }
-
 
     // Para crear un nuevo producto
     public static Producto mostrarDialogoNuevo(Component parent) throws Exception {
@@ -196,7 +194,6 @@ public class VentaUI {
     public static void mostrarMensaje(Component parent, String mensaje) {
         JOptionPane.showMessageDialog(parent, mensaje);
     }
-
 
     public static void mostrarTablaVentas(JFrame frame) {
         List<Venta> ventas = ArchivoBinario.cargar("reporteVentas.ser");
@@ -232,8 +229,4 @@ public class VentaUI {
     public static void mostrarMensaje(Component parent, String mensaje, int tipo) {
         JOptionPane.showMessageDialog(parent, mensaje, "Información", tipo);
     }
-
-
-
-
 }

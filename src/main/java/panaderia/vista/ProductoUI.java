@@ -71,7 +71,7 @@ public class ProductoUI {
             Producto original = controlador.obtenerProductoPorNombre(nombreSeleccionado);
             if (original != null) {
                 try {
-                    // Muestra el formulario prellenado con los datos actuales del producto
+                    // Muestra el formulario con los datos actuales del producto
                     Producto editado = FormularioProducto.mostrarDialogo(frame, original);
                     if (editado != null) {
                         // Se reemplaza el producto anterior por el nuevo

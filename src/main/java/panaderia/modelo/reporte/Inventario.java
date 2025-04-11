@@ -54,23 +54,4 @@ public class Inventario {
         return productos;
     }
 
-    // Calcula el valor total del inventario multiplicando precio por cantidad.
-    public double calcularValorTotal() {
-        double total = 0;
-        for (Producto p : productos) {
-            total += p.getPrecioVenta() * p.getCantidad();
-        }
-        return total;
-    }
-
-    // Imprime en consola la descripción y cantidad de cada producto en el inventario.
-    public void listarProductos() {
-        if (productos.isEmpty()) {
-            System.out.println("Inventario vacío.");
-        } else {
-            for (Producto p : productos) {
-                System.out.println(p.getDescripcion() + " - Cantidad: " + p.getCantidad());
-            }
-        }
-    }
 }
