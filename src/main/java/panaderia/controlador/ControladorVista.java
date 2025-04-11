@@ -101,8 +101,9 @@ public class ControladorVista {
                 if (getModel().isArmed() && getModel().isPressed()) {
                     g2.setColor(new Color(100, 200, 150)); // verde suave
                 } else {
-                    g2.setColor(new Color(60, 63, 65)); // fondo normal
+                    g2.setColor(new Color(40, 120, 90)); // verde bosque
                 }
+
 
                 g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 14, 14);
                 super.paintComponent(g);
