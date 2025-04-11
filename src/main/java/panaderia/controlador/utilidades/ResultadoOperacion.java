@@ -9,6 +9,10 @@ public class ResultadoOperacion {
         this.mensaje = mensaje;
     }
 
+    public ResultadoOperacion(boolean exito) {
+        this.exito = exito;
+    }
+
     public boolean isExito() {
         return exito;
     }

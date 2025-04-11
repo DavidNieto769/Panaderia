@@ -34,7 +34,7 @@ public class ControladorVista {
     public void guardarReportes(JFrame frame) {
         //controlador.guardarReporteConFecha();
         guardarReporteVentasCSV();
-        //mostrarMensaje(frame, "Reporte generado exitosamente.");
+        mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 
     public void mostrarVentas(JFrame frame) {

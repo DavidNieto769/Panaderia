@@ -163,7 +163,7 @@ public class ControladorInventario {
         Venta nuevaVenta = new Venta(new Date(), List.of(vendido));
         guardarVenta(nuevaVenta);
 
-        return new ResultadoOperacion(true, "Venta realizada con éxito.");
+        return new ResultadoOperacion(true);
     }
 
     public void guardarVenta(Venta venta) {
@@ -179,7 +179,7 @@ public class ControladorInventario {
 
         VentaUI.mostrar(parentComponent, disponibles, (nombreProducto, cantidadVendida) -> {
             ResultadoOperacion resultado = registrarVenta(nombreProducto, cantidadVendida);
-            VentaUI.mostrarMensaje(parentComponent, resultado.getMensaje());
+            //VentaUI.mostrarMensaje(parentComponent, resultado.getMensaje());
             if (resultado.isExito()) {
                 callbackActualizarTabla.run();
             }
