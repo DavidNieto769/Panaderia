@@ -18,6 +18,100 @@ import panaderia.persistencia.ArchivoBinario;
 public class VentaUI {
     java.util.List<String> productosSeleccionados = new java.util.ArrayList<>();
 
+
+    private static int pedirNumeroProductosDiferentes(Component parentComponent) {
+        JTextField campoNumero = new JTextField();
+        ((AbstractDocument) campoNumero.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
+
+        int resultado = JOptionPane.showConfirmDialog(
+                parentComponent,
+                campoNumero,
+                "¿Cuántos productos diferentes desea vender?",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (resultado != JOptionPane.OK_OPTION) return -1;
+
+        String input = campoNumero.getText().trim();
+        try {
+            int numeroProductos = Integer.parseInt(input);
+            if (numeroProductos <= 0) throw new NumberFormatException("Debe ser mayor que cero.");
+            return numeroProductos;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(parentComponent, "Número inválido: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return -1;
+        }
+    }
+
+
+    private static void actualizarCombos(JComboBox<String>[] combos, List<Producto> productosDisponibles) {
+        Set<String> seleccionados = new HashSet<>();
+        for (JComboBox<String> combo : combos) {
+            if (combo.getSelectedItem() != null) {
+                seleccionados.add(combo.getSelectedItem().toString());
+            }
+        }
+
+        for (int i = 0; i < combos.length; i++) {
+            String seleccionActual = (String) combos[i].getSelectedItem();
+
+            combos[i].removeAllItems();
+            for (Producto p : productosDisponibles) {
+                String nombre = p.getNombre();
+                if (!seleccionados.contains(nombre) || nombre.equals(seleccionActual)) {
+                    combos[i].addItem(nombre);
+                }
+            }
+
+            combos[i].setSelectedItem(seleccionActual); // Mantener selección si aún está disponible
+        }
+    }
+
+    private static boolean validarProductosSeleccionados(Component parentComponent,
+                                                         int numeroProductos,
+                                                         JComboBox<String>[] combos,
+                                                         JTextField[] camposCantidad,
+                                                         List<Producto> productosDisponibles) {
+        for (int i = 0; i < numeroProductos; i++) {
+            String productoSeleccionado = (String) combos[i].getSelectedItem();
+            String cantidadTexto = camposCantidad[i].getText().trim();
+
+            try {
+                int cantidad = Integer.parseInt(cantidadTexto);
+                if (cantidad <= 0) throw new NumberFormatException("Debe ser mayor que cero.");
+
+                Producto p = productosDisponibles.stream()
+                        .filter(prod -> prod.getNombre().equals(productoSeleccionado))
+                        .findFirst().orElse(null);
+
+                if (p == null) throw new Exception("Producto no encontrado.");
+                if (p.getCantidad() < cantidad) {
+                    JOptionPane.showMessageDialog(parentComponent,
+                            "No hay suficiente stock para \"" + p.getNombre() + "\". Stock disponible: " + p.getCantidad(),
+                            "Stock insuficiente",
+                            JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(parentComponent,
+                        "Cantidad inválida para producto #" + (i + 1) + ": " + e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(parentComponent,
+                        e.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
     public static void mostrar(Component parentComponent, List<Producto> productosDisponibles, VentaCallback callback) {
         if (productosDisponibles.isEmpty()) {
             JOptionPane.showMessageDialog(parentComponent, "No hay productos disponibles para vender.");
@@ -26,28 +120,8 @@ public class VentaUI {
 
         while (true) {
 
-            JTextField campoNumero = new JTextField();
-            ((AbstractDocument) campoNumero.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
-
-            int resultado = JOptionPane.showConfirmDialog(
-                    null,
-                    campoNumero,
-                    "¿Cuántos productos diferentes desea vender?",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-
-            if (resultado != JOptionPane.OK_OPTION) break;
-
-            String input = campoNumero.getText().trim();
-            int numeroProductos;
-            try {
-                numeroProductos = Integer.parseInt(input);
-                if (numeroProductos <= 0) throw new NumberFormatException("Debe ser mayor que cero.");
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Número inválido: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
+            int numeroProductos = pedirNumeroProductosDiferentes(parentComponent);
+            if (numeroProductos <= 0) continue;
 
             JPanel panel = new JPanel(new GridLayout(numeroProductos * 2, 2, 5, 5));
             JComboBox<String>[] combos = new JComboBox[numeroProductos];
@@ -66,28 +140,8 @@ public class VentaUI {
             }
 
 // Función para actualizar dinámicamente los combos
-            Runnable actualizarCombos = () -> {
-                Set<String> seleccionados = new HashSet<>();
-                for (JComboBox<String> combo : combos) {
-                    if (combo.getSelectedItem() != null) {
-                        seleccionados.add(combo.getSelectedItem().toString());
-                    }
-                }
+            Runnable actualizarCombos = () -> actualizarCombos(combos, productosDisponibles);
 
-                for (int i = 0; i < combos.length; i++) {
-                    String seleccionActual = (String) combos[i].getSelectedItem();
-
-                    combos[i].removeAllItems();
-                    for (Producto p : productosDisponibles) {
-                        String nombre = p.getNombre();
-                        if (!seleccionados.contains(nombre) || nombre.equals(seleccionActual)) {
-                            combos[i].addItem(nombre);
-                        }
-                    }
-
-                    combos[i].setSelectedItem(seleccionActual); // Mantener selección si aún está disponible
-                }
-            };
 
 // Agregamos listener a todos los combos
             for (JComboBox<String> combo : combos) {
@@ -97,45 +151,12 @@ public class VentaUI {
 // Llenamos inicialmente los combos
             actualizarCombos.run();
 
-
             int opcion = JOptionPane.showConfirmDialog(parentComponent, panel, "Registrar Ventas", JOptionPane.OK_CANCEL_OPTION);
             if (opcion != JOptionPane.OK_OPTION) break;
 
-            boolean error = false;
-            for (int i = 0; i < numeroProductos; i++) {
-                String productoSeleccionado = (String) combos[i].getSelectedItem();
-                String cantidadTexto = camposCantidad[i].getText().trim();
+            boolean esValido = validarProductosSeleccionados(parentComponent, numeroProductos, combos, camposCantidad, productosDisponibles);
+            if (!esValido) continue;
 
-                try {
-                    int cantidad = Integer.parseInt(cantidadTexto);
-                    if (cantidad <= 0) throw new NumberFormatException("Debe ser mayor que cero.");
-
-                    Producto p = productosDisponibles.stream()
-                            .filter(prod -> prod.getNombre().equals(productoSeleccionado))
-                            .findFirst().orElse(null);
-
-                    if (p == null) throw new Exception("Producto no encontrado.");
-                    if (p.getCantidad() < cantidad) {
-                        JOptionPane.showMessageDialog(parentComponent,
-                                "No hay suficiente stock para \"" + p.getNombre() + "\". Stock disponible: " + p.getCantidad(),
-                                "Stock insuficiente",
-                                JOptionPane.ERROR_MESSAGE);
-                        error = true;
-                        break;
-                    }
-
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(parentComponent, "Cantidad inválida para producto #" + (i + 1) + ": " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    error = true;
-                    break;
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(parentComponent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    error = true;
-                    break;
-                }
-            }
-
-            if (error) continue; // vuelve a mostrar el formulario
 
             // Todas las validaciones fueron correctas, realizamos las ventas
             for (int i = 0; i < numeroProductos; i++) {
