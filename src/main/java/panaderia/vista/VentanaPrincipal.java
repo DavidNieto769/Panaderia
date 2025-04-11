@@ -13,6 +13,7 @@ import java.util.List;
 
 import panaderia.controlador.ControladorInventario;
 import panaderia.controlador.ControladorVista;
+import panaderia.controlador.utilidades.FiltroTexto;
 import panaderia.modelo.Producto;
 import panaderia.controlador.utilidades.FiltroSoloLetras;
 
@@ -157,13 +158,19 @@ public class VentanaPrincipal extends JFrame {
 
         filtroNombre = new JTextField(10);
         filtroNombre.setFont(fuente);
-        ((AbstractDocument) filtroNombre.getDocument()).setDocumentFilter(new FiltroSoloLetras());
+        //((AbstractDocument) filtroNombre.getDocument()).setDocumentFilter(new FiltroSoloLetras());
+        ((AbstractDocument) filtroNombre.getDocument()).setDocumentFilter(new FiltroTexto.SoloLetras());
+
 
         filtroPrecio = new JTextField(5);
         filtroPrecio.setFont(fuente);
+        ((AbstractDocument) filtroPrecio.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
+
 
         filtroCantidad = new JTextField(5);
         filtroCantidad.setFont(fuente);
+        ((AbstractDocument) filtroCantidad.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
+
 
 
         JLabel labelNombre = new JLabel("Nombre:");

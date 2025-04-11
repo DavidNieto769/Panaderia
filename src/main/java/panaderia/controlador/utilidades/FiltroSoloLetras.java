@@ -34,4 +34,7 @@ public class FiltroSoloLetras extends DocumentFilter {
                     "Entrada no válida", JOptionPane.WARNING_MESSAGE);
         });
     }
+
+
+
 }
