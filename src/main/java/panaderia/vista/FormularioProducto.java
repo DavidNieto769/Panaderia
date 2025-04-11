@@ -8,8 +8,23 @@ import panaderia.fabrica.*;
 public class FormularioProducto {
 
     public static Producto mostrarDialogo(Component parent, Producto productoExistente) throws Exception {
-        String tipo = "Pan"; // valor por defecto
-        if (productoExistente != null) {
+        String tipo = "Pan"; // Valor por defecto
+
+        // Preguntar el tipo solo si es un producto nuevo
+        if (productoExistente == null) {
+            String[] opciones = {"Pan", "Galleta"};
+            tipo = (String) JOptionPane.showInputDialog(
+                    parent,
+                    "¿Qué tipo de producto desea crear?",
+                    "Seleccionar Tipo",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            if (tipo == null) return null; // Cancelado
+        } else {
             tipo = productoExistente instanceof Pan ? "Pan" : "Galleta";
         }
 

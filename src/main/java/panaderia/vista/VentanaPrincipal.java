@@ -238,7 +238,7 @@ public class VentanaPrincipal extends JFrame {
 
     private JScrollPane crearTablaScroll() {
         modeloTabla = new DefaultTableModel(
-                new Object[]{"Nombre", "Precio", "Costo", "Cantidad", "Extra"}, 0
+                new Object[]{"Nombre", "Precio", "Costo", "Cantidad disponible", "Extra"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -313,8 +313,8 @@ public class VentanaPrincipal extends JFrame {
                     p.getCostoProduccion(),
                     p.getCantidad(),
                     p instanceof panaderia.modelo.Pan ?
-                            (((panaderia.modelo.Pan) p).isTieneQueso() ? "Sí" : "No") :
-                            (((panaderia.modelo.Galleta) p).isTieneChispas() ? "Sí" : "No")
+                            (((panaderia.modelo.Pan) p).isTieneQueso() ? "Queso" : "No") :
+                            (((panaderia.modelo.Galleta) p).isTieneChispas() ? "Chispas de Chocolate" : "No")
             });
         }
     }
