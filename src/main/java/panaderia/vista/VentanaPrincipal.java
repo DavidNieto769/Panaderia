@@ -176,7 +176,7 @@ public class VentanaPrincipal extends JFrame {
         labelCantidad.setFont(fuente);
         labelCantidad.setForeground(new Color(40, 120, 90));
 
-        panelFiltros.setBackground(new Color(255, 255, 255)); // verde muy claro
+        panelFiltros.setBackground(new Color(255,255,255)); // verde muy claro
 
         panelFiltros.add(labelNombre);
         panelFiltros.add(filtroNombre);
@@ -267,8 +267,8 @@ public class VentanaPrincipal extends JFrame {
                         table, value, isSelected, hasFocus, row, column);
                 label.setFont(fuenteEncabezado);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
-                label.setBackground(new Color(200, 240, 220));
-                label.setForeground(new Color(30, 100, 80));
+                label.setBackground(new Color(16, 78, 42));
+                label.setForeground(new Color(255, 255, 255));
                 label.setOpaque(true);
                 return label;
             }

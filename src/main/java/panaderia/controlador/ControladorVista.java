@@ -34,7 +34,7 @@ public class ControladorVista {
     public void guardarReportes(JFrame frame) {
         //controlador.guardarReporteConFecha();
         guardarReporteVentasCSV();
-        mostrarMensaje(frame, "Reporte generado exitosamente.");
+        //mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 
     public void mostrarVentas(JFrame frame) {
@@ -101,7 +101,7 @@ public class ControladorVista {
                 if (getModel().isArmed() && getModel().isPressed()) {
                     g2.setColor(new Color(100, 200, 150)); // verde suave
                 } else {
-                    g2.setColor(new Color(40, 120, 90)); // verde bosque
+                    g2.setColor(new Color(13, 71, 47)); // verde bosque
                 }
 
 

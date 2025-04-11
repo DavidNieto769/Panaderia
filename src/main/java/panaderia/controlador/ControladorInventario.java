@@ -135,7 +135,7 @@ public class ControladorInventario {
                 if (actualizarVista != null) actualizarVista.run();
             }
         } catch (Exception ex) {
-            VentaUI.mostrarError(parentComponent, "Error al crear producto: " + ex.getMessage());
+            VentaUI.mostrarError(parentComponent, "Error al crear producto: Debes llenar todos los espacios ");
         }
     }
 
