@@ -13,7 +13,7 @@ import java.util.List;
 
 import panaderia.controlador.ControladorInventario;
 import panaderia.controlador.ControladorVista;
-import panaderia.controlador.utilidades.FiltroTexto;
+import panaderia.vista.utilidadesvista.FiltroTexto;
 import panaderia.modelo.Producto;
 
 

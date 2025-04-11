@@ -1,4 +1,4 @@
-package panaderia.controlador.utilidades;
+package panaderia.vista.utilidadesvista;
 
 import javax.swing.*;
 import javax.swing.text.*;

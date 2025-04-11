@@ -3,7 +3,7 @@ package panaderia.vista;
 import javax.swing.*;
 import java.awt.*;
 
-import panaderia.controlador.utilidades.FiltroTexto;
+import panaderia.vista.utilidadesvista.FiltroTexto;
 import panaderia.modelo.Producto;
 
 import java.util.HashSet;

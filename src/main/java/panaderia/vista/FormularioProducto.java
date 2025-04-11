@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.text.AbstractDocument;
 import java.awt.*;
 
-import panaderia.controlador.utilidades.FiltroTexto;
+import panaderia.vista.utilidadesvista.FiltroTexto;
 import panaderia.modelo.*;
 import panaderia.fabrica.*;
 
