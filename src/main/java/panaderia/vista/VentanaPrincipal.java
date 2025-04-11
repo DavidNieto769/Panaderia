@@ -76,8 +76,7 @@ public class VentanaPrincipal extends JFrame {
 
 
         JButton btnAgregar = ControladorVista.crearBotonRedondeado(" Agregar producto", "Agregar un nuevo producto al inventario");
-        JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar filtro", "Limpiar todos los filtros");
-        JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Guardar Reporte", "Guardar reporte en archivo CSV");
+        JButton btnGuardar = ControladorVista.crearBotonRedondeado(" Exportar reporte en CSV", "Guardar reporte en archivo CSV");
         JButton btnVender = ControladorVista.crearBotonRedondeado(" Vender producto", "Registrar la venta de un producto");
         JButton btnVerVentas = ControladorVista.crearBotonRedondeado(" Ver Ventas", "Mostrar historial de ventas");
         JButton btnEditar = ControladorVista.crearBotonRedondeado(" Editar producto", "Editar el producto seleccionado");
@@ -85,7 +84,6 @@ public class VentanaPrincipal extends JFrame {
 
 
         btnAgregar.setToolTipText("Agregar un nuevo producto al inventario");
-        btnLimpiar.setToolTipText("Limpiar todos los filtros");
         btnGuardar.setToolTipText("Guardar reporte en archivo CSV");
         btnVender.setToolTipText("Registrar la venta de un producto");
         btnVerVentas.setToolTipText("Mostrar historial de ventas");
@@ -104,12 +102,6 @@ public class VentanaPrincipal extends JFrame {
                 controladorVista.mostrarVentas(this)
         );
 
-
-
-        btnLimpiar.addActionListener(e -> {
-            limpiarFiltros();
-            actualizarTabla(controladorVista.obtenerProductos());
-        });
 
 
         btnGuardar.addActionListener(e ->
@@ -132,7 +124,6 @@ public class VentanaPrincipal extends JFrame {
 
 
         panelBotones.add(btnAgregar);
-        panelBotones.add(btnLimpiar);
         panelBotones.add(btnGuardar);
         panelBotones.add(btnVender);
         panelBotones.add(btnVerVentas);
@@ -172,6 +163,12 @@ public class VentanaPrincipal extends JFrame {
         ((AbstractDocument) filtroCantidad.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
 
 
+        JButton btnLimpiar = ControladorVista.crearBotonRedondeado(" Limpiar filtro", "Limpiar todos los filtros");
+        btnLimpiar.setToolTipText("Limpiar todos los filtros");
+        btnLimpiar.addActionListener(e -> {
+            limpiarFiltros();
+            actualizarTabla(controladorVista.obtenerProductos());
+        });
 
         JLabel labelNombre = new JLabel("Nombre:");
         labelNombre.setFont(fuente);
@@ -191,6 +188,8 @@ public class VentanaPrincipal extends JFrame {
         panelFiltros.add(filtroPrecio);
         panelFiltros.add(labelCantidad);
         panelFiltros.add(filtroCantidad);
+        panelFiltros.add(btnLimpiar);
+
 
         return panelFiltros;
     }
