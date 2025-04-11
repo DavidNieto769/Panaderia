@@ -16,7 +16,6 @@ import panaderia.modelo.reporte.Venta;
 import panaderia.persistencia.ArchivoBinario;
 
 public class VentaUI {
-    java.util.List<String> productosSeleccionados = new java.util.ArrayList<>();
 
 
     private static int pedirNumeroProductosDiferentes(Component parentComponent) {

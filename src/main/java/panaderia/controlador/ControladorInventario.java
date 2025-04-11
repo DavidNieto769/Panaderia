@@ -93,21 +93,6 @@ public class ControladorInventario {
         }
     }
 
-    public void editarProducto(String nombreAnterior, Producto productoEditado) {
-        // Reemplaza el producto anterior por el nuevo
-        inventario.eliminarProducto(nombreAnterior);
-
-        if (productoEditado instanceof Pan) {
-            panDAO.insertar(productoEditado, panDAO.obtenerTodos());
-        } else if (productoEditado instanceof Galleta) {
-            galletaDAO.insertar(productoEditado, galletaDAO.obtenerTodos());
-        }
-
-        inventario.agregarProducto(productoEditado);
-    }
-
-
-
     public void eliminarProducto(Producto producto) {
         if (producto instanceof Pan) {
             panDAO.eliminar((Pan) producto);
@@ -117,15 +102,12 @@ public class ControladorInventario {
         sincronizarInventario(); // Refresca los datos en memoria tras eliminar
     }
 
-
     //inventario desde archivos serializados
     public void sincronizarInventario() {
         inventario.limpiar();
         inventario.getProductos().addAll(panDAO.obtenerTodos());
         inventario.getProductos().addAll(galletaDAO.obtenerTodos());
     }
-
-
 
 
     public void crearProducto(Component parentComponent, Runnable actualizarVista) {
@@ -140,6 +122,7 @@ public class ControladorInventario {
             VentaUI.mostrarError(parentComponent, "Error al crear producto: Debes llenar todos los espacios ");
         }
     }
+
 // Registra una venta y actualiza inventario y archivo de ventas
 
     public ResultadoOperacion registrarVenta(String nombreProducto, int cantidadVendida) {

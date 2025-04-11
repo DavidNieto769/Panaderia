@@ -31,8 +31,7 @@ public class ControladorVista {
     }
 
     public void guardarReportes(JFrame frame) {
-        //controlador.guardarReporteConFecha();
-        guardarReporteVentasCSV(); // Genera el reporte de ventas en formato CSV.
+        guardarReporteVentasCSV(); // Generra el reporte de ventas en formato CSV.
         mostrarMensaje(frame, "Reporte generado exitosamente.");
     }
 

@@ -51,7 +51,7 @@ public abstract class AbstractProductoDAO implements ProductoDAO {
         ArchivoBinario.guardar(archivo, productos);
     }
 
-    // Si aún necesitas este método por fuera
+
     public void guardarTodos(List<Producto> productos) {
         ArchivoBinario.guardar(archivo, productos);
     }
