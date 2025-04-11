@@ -1,11 +1,15 @@
 package panaderia.dao;
 
-import java.util.ArrayList;
-import java.util.List;
 import panaderia.modelo.Producto;
 import panaderia.persistencia.ArchivoBinario;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.List;
+
 public abstract class AbstractProductoDAO implements ProductoDAO {
+
     private final String archivo;
 
     public AbstractProductoDAO(String archivo) {
@@ -20,8 +24,15 @@ public abstract class AbstractProductoDAO implements ProductoDAO {
     }
 
     @Override
+    public void eliminar(Producto producto) {
+        List<Producto> productos = ArchivoBinario.cargar(archivo);
+        productos.removeIf(p -> p.getNombre().equalsIgnoreCase(producto.getNombre()));
+        ArchivoBinario.guardar(archivo, productos); // guardar el nuevo estado
+    }
+
+    @Override
     public List<Producto> obtenerTodos() {
-        return new ArrayList<>(ArchivoBinario.cargar(archivo));
+        return ArchivoBinario.cargar(archivo);
     }
 
     @Override
@@ -43,4 +54,14 @@ public abstract class AbstractProductoDAO implements ProductoDAO {
         }
         ArchivoBinario.guardar(archivo, productos);
     }
+
+    // Si aún necesitas este método por fuera
+    public void guardarTodos(List<Producto> productos) {
+        ArchivoBinario.guardar(archivo, productos);
+    }
 }
+
+
+
+
+

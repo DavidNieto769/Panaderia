@@ -5,3 +5,4 @@ public class PanDAO extends AbstractProductoDAO {
         super("pan.ser");
     }
 }
+

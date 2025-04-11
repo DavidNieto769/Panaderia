@@ -2,24 +2,30 @@ package panaderia.vista;
 
 import javax.swing.*;
 import java.awt.*;
+import panaderia.modelo.*;
 import panaderia.fabrica.*;
-import panaderia.modelo.Producto;
 
 public class FormularioProducto {
 
-    public static Producto mostrarDialogo(Component parent) throws Exception {
-        String[] opciones = { "Pan", "Galleta" };
+    public static Producto mostrarDialogo(Component parent, Producto productoExistente) throws Exception {
+        String tipo = "Pan"; // valor por defecto
+        if (productoExistente != null) {
+            tipo = productoExistente instanceof Pan ? "Pan" : "Galleta";
+        }
 
-        String tipo = (String) JOptionPane.showInputDialog(parent, "Tipo de producto", "Selecciona",
-                JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
+        JTextField nombre = new JTextField(productoExistente != null ? productoExistente.getNombre() : "");
+        JTextField precio = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getPrecioVenta()) : "");
+        JTextField costo = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getCostoProduccion()) : "");
+        JTextField cantidad = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getCantidad()) : "");
 
-        if (tipo == null) return null;
-
-        JTextField nombre = new JTextField();
-        JTextField precio = new JTextField();
-        JTextField costo = new JTextField();
-        JTextField cantidad = new JTextField();
-        JCheckBox extra = new JCheckBox(tipo.equals("Pan") ? "¿Tiene queso?" : "¿Tiene chispas de chocolate?");
+        JCheckBox extra;
+        if (tipo.equals("Pan")) {
+            boolean tieneQueso = productoExistente instanceof Pan && ((Pan) productoExistente).isTieneQueso();
+            extra = new JCheckBox("¿Tiene queso?", tieneQueso);
+        } else {
+            boolean tieneChispas = productoExistente instanceof Galleta && ((Galleta) productoExistente).isTieneChispas();
+            extra = new JCheckBox("¿Tiene chispas de chocolate?", tieneChispas);
+        }
 
         Object[] campos = {
                 "Nombre:", nombre,
@@ -29,7 +35,8 @@ public class FormularioProducto {
                 extra
         };
 
-        int opcion = JOptionPane.showConfirmDialog(parent, campos, "Nuevo " + tipo, JOptionPane.OK_CANCEL_OPTION);
+        String titulo = productoExistente == null ? "Nuevo " + tipo : "Editar " + tipo;
+        int opcion = JOptionPane.showConfirmDialog(parent, campos, titulo, JOptionPane.OK_CANCEL_OPTION);
 
         if (opcion == JOptionPane.OK_OPTION) {
             String nom = nombre.getText();

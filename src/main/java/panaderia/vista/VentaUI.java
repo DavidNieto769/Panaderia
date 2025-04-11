@@ -52,9 +52,18 @@ public class VentaUI {
         }
     }
 
-    public static Producto solicitarProducto(Component parentComponent) throws Exception {
-        return FormularioProducto.mostrarDialogo(parentComponent);
+
+
+    // Para crear un nuevo producto
+    public static Producto mostrarDialogoNuevo(Component parent) throws Exception {
+        return FormularioProducto.mostrarDialogo(parent, null);
     }
+
+    // Para editar un producto existente
+    public static Producto mostrarDialogoEditar(Component parent, Producto productoExistente) throws Exception {
+        return FormularioProducto.mostrarDialogo(parent, productoExistente);
+    }
+
 
     public static void mostrarError(Component parentComponent, String mensaje) {
         JOptionPane.showMessageDialog(parentComponent, mensaje, "Error", JOptionPane.ERROR_MESSAGE);

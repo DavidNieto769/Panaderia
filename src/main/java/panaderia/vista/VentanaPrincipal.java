@@ -122,12 +122,16 @@ public class VentanaPrincipal extends JFrame {
 
 
         btnEditar.addActionListener(e -> {
-
+            controladorVista.editarProducto(this, () -> actualizarTabla(controladorVista.obtenerProductos()));
         });
+
 
         btnEliminar.addActionListener(e -> {
-
+            controladorVista.eliminarProducto(this, () -> actualizarTabla(controladorVista.obtenerProductos()));
         });
+
+
+
 
         panelBotones.add(btnAgregar);
         panelBotones.add(btnFiltrar);

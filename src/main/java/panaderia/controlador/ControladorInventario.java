@@ -95,9 +95,41 @@ public class ControladorInventario {
         }
     }
 
+    public void editarProducto(Producto productoEditado) {
+        if (productoEditado instanceof Pan) {
+            panDAO.insertar(productoEditado, panDAO.obtenerTodos());
+        } else if (productoEditado instanceof Galleta) {
+            galletaDAO.insertar(productoEditado, galletaDAO.obtenerTodos());
+        }
+        sincronizarInventario(); // igual que en eliminar
+    }
+
+
+
+    public void eliminarProducto(Producto producto) {
+        if (producto instanceof Pan) {
+            panDAO.eliminar((Pan) producto);
+        } else if (producto instanceof Galleta) {
+            galletaDAO.eliminar((Galleta) producto);
+        }
+        sincronizarInventario(); // muy importante para reflejar los cambios
+    }
+
+
+
+    public void sincronizarInventario() {
+        inventario.limpiar();
+        inventario.getProductos().addAll(panDAO.obtenerTodos());
+        inventario.getProductos().addAll(galletaDAO.obtenerTodos());
+    }
+
+
+
+
+
     public void crearProducto(Component parentComponent, Runnable actualizarVista) {
         try {
-            Producto producto = VentaUI.solicitarProducto(parentComponent);
+            Producto producto = VentaUI.mostrarDialogoNuevo(parentComponent);
             if (producto != null) {
                 agregarProducto(producto);
                 guardarSerializable(producto);

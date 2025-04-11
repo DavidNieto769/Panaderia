@@ -8,5 +8,6 @@ public interface ProductoDAO {
     List<Producto> obtenerTodos();
     Producto buscarPorNombre(String nombre);
     void actualizarCantidad(String nombre, int nuevaCantidad);
-
+    void eliminar(Producto producto);
+    void guardarTodos(List<Producto> productos);
 }

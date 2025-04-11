@@ -55,21 +55,13 @@ public class Inventario {
         }
     }
 
-    public List<Producto> filtrarPorNombre(String nombreParcial) {
-        return productos.stream()
-                .filter(p -> p.getNombre().toLowerCase().contains(nombreParcial.toLowerCase()))
-                .collect(Collectors.toList());
+    public void editarProducto(Producto producto) {
+        eliminarProducto(producto.getNombre());
+        agregarProducto(producto);
     }
 
-    public List<Producto> filtrarPorPrecioMaximo(double precioMaximo) {
-        return productos.stream()
-                .filter(p -> p.getPrecioVenta() <= precioMaximo)
-                .collect(Collectors.toList());
+    public void eliminarProducto(String nombre) {
+        productos.removeIf(p -> p.getNombre().equalsIgnoreCase(nombre));
     }
 
-    public List<Producto> filtrarPorCantidadMinima(int cantidadMinima) {
-        return productos.stream()
-                .filter(p -> p.getCantidad() >= cantidadMinima)
-                .collect(Collectors.toList());
-    }
 }
