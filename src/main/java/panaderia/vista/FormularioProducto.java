@@ -1,7 +1,10 @@
 package panaderia.vista;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
 import java.awt.*;
+
+import panaderia.controlador.utilidades.FiltroTexto;
 import panaderia.modelo.*;
 import panaderia.fabrica.*;
 
@@ -29,9 +32,15 @@ public class FormularioProducto {
         }
 
         JTextField nombre = new JTextField(productoExistente != null ? productoExistente.getNombre() : "");
+        ((AbstractDocument) nombre.getDocument()).setDocumentFilter(new FiltroTexto.SoloLetras());
         JTextField precio = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getPrecioVenta()) : "");
+        ((AbstractDocument) precio.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
         JTextField costo = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getCostoProduccion()) : "");
+        ((AbstractDocument) costo.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
         JTextField cantidad = new JTextField(productoExistente != null ? String.valueOf(productoExistente.getCantidad()) : "");
+        ((AbstractDocument) cantidad.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
+
+
 
         JCheckBox extra;
         if (tipo.equals("Pan")) {

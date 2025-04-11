@@ -2,12 +2,16 @@ package panaderia.vista;
 
 import javax.swing.*;
 import java.awt.*;
+
+import panaderia.controlador.utilidades.FiltroTexto;
 import panaderia.modelo.Producto;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
+
 import panaderia.modelo.reporte.Venta;
 import panaderia.persistencia.ArchivoBinario;
 
@@ -21,9 +25,21 @@ public class VentaUI {
         }
 
         while (true) {
-            String input = JOptionPane.showInputDialog(null, "¿Cuántos productos diferentes desea vender?", "Cantidad de productos", JOptionPane.QUESTION_MESSAGE);
-            if (input == null) break;
 
+            JTextField campoNumero = new JTextField();
+            ((AbstractDocument) campoNumero.getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
+
+            int resultado = JOptionPane.showConfirmDialog(
+                    null,
+                    campoNumero,
+                    "¿Cuántos productos diferentes desea vender?",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (resultado != JOptionPane.OK_OPTION) break;
+
+            String input = campoNumero.getText().trim();
             int numeroProductos;
             try {
                 numeroProductos = Integer.parseInt(input);
@@ -46,6 +62,7 @@ public class VentaUI {
                 panel.add(combos[i]);
                 panel.add(new JLabel("Cantidad:"));
                 panel.add(camposCantidad[i]);
+                ((AbstractDocument) camposCantidad[i].getDocument()).setDocumentFilter(new FiltroTexto.SoloNumeros());
             }
 
 // Función para actualizar dinámicamente los combos
